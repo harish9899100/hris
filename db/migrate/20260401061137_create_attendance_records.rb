@@ -5,7 +5,6 @@ class CreateAttendanceRecords < ActiveRecord::Migration[8.1]
       t.date :date
       t.datetime :check_in
       t.datetime :check_out
-      t.references :organization, null: false, foreign_key: true
 
       t.timestamps
     end

@@ -5,9 +5,9 @@ class CreatePositions < ActiveRecord::Migration[8.1]
       t.references :department, null: false, foreign_key: true
       t.integer :employment_type
       t.decimal :base_salary
-      t.references :organization, null: false, foreign_key: true
 
       t.timestamps
     end
+    add_index :positions, [:department_id, :title], unique: true
   end
 end

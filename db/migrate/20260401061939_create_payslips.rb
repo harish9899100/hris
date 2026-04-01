@@ -7,9 +7,9 @@ class CreatePayslips < ActiveRecord::Migration[8.1]
       t.decimal :gross
       t.decimal :deductions
       t.decimal :net
-      t.references :organization, null: false, foreign_key: true
 
       t.timestamps
     end
+    add_index :payslips, [:employee_id, :month, :year], unique: true
   end
 end

@@ -7,7 +7,6 @@ class CreateLeaveRequests < ActiveRecord::Migration[8.1]
       t.date :end_date
       t.integer :status
       t.text :reason
-      t.references :organization, null: false, foreign_key: true
 
       t.timestamps
     end

@@ -12,11 +12,10 @@ class CreateEmployees < ActiveRecord::Migration[8.1]
       t.integer :employment_status
       t.decimal :salary
       t.string :phone
-      t.references :organization, null: false, foreign_key: true
 
       t.timestamps
     end
     add_index :employees, :email, unique: true
-    add_index :employees, [:organization_id, :employee_id], unique: true
+    add_index :employees, :employee_id, unique: true
   end
 end

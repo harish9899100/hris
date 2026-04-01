@@ -3,9 +3,9 @@ class CreateDepartments < ActiveRecord::Migration[8.1]
     create_table :departments do |t|
       t.string :name
       t.text :description
-      t.references :organization, null: false, foreign_key: true
 
       t.timestamps
     end
+    add_index :departments, :name, unique: true
   end
 end

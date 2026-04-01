@@ -20,11 +20,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_063623) do
     t.datetime "created_at", null: false
     t.date "date"
     t.bigint "employee_id", null: false
-    t.bigint "organization_id", null: false
     t.datetime "updated_at", null: false
     t.index ["employee_id", "date"], name: "index_attendance_records_on_employee_id_and_date", unique: true
     t.index ["employee_id"], name: "index_attendance_records_on_employee_id"
-    t.index ["organization_id"], name: "index_attendance_records_on_organization_id"
   end
 
   create_table "departments", force: :cascade do |t|
@@ -32,10 +30,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_063623) do
     t.text "description"
     t.bigint "manager_id"
     t.string "name"
-    t.bigint "organization_id", null: false
     t.datetime "updated_at", null: false
     t.index ["manager_id"], name: "index_departments_on_manager_id"
-    t.index ["organization_id"], name: "index_departments_on_organization_id"
+    t.index ["name"], name: "index_departments_on_name", unique: true
   end
 
   create_table "employees", force: :cascade do |t|
@@ -48,16 +45,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_063623) do
     t.string "first_name"
     t.string "last_name"
     t.bigint "manager_id"
-    t.bigint "organization_id", null: false
     t.string "phone"
     t.bigint "position_id", null: false
     t.decimal "salary"
     t.datetime "updated_at", null: false
     t.index ["department_id"], name: "index_employees_on_department_id"
     t.index ["email"], name: "index_employees_on_email", unique: true
+    t.index ["employee_id"], name: "index_employees_on_employee_id", unique: true
     t.index ["manager_id"], name: "index_employees_on_manager_id"
-    t.index ["organization_id", "employee_id"], name: "index_employees_on_organization_id_and_employee_id", unique: true
-    t.index ["organization_id"], name: "index_employees_on_organization_id"
     t.index ["position_id"], name: "index_employees_on_position_id"
   end
 
@@ -66,13 +61,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_063623) do
     t.bigint "employee_id", null: false
     t.date "end_date"
     t.string "leave_type"
-    t.bigint "organization_id", null: false
     t.text "reason"
     t.date "start_date"
     t.integer "status"
     t.datetime "updated_at", null: false
     t.index ["employee_id"], name: "index_leave_requests_on_employee_id"
-    t.index ["organization_id"], name: "index_leave_requests_on_organization_id"
   end
 
   create_table "organizations", force: :cascade do |t|
@@ -91,11 +84,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_063623) do
     t.decimal "gross"
     t.integer "month"
     t.decimal "net"
-    t.bigint "organization_id", null: false
     t.datetime "updated_at", null: false
     t.integer "year"
+    t.index ["employee_id", "month", "year"], name: "index_payslips_on_employee_id_and_month_and_year", unique: true
     t.index ["employee_id"], name: "index_payslips_on_employee_id"
-    t.index ["organization_id"], name: "index_payslips_on_organization_id"
   end
 
   create_table "positions", force: :cascade do |t|
@@ -103,35 +95,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_063623) do
     t.datetime "created_at", null: false
     t.bigint "department_id", null: false
     t.integer "employment_type"
-    t.bigint "organization_id", null: false
     t.string "title"
     t.datetime "updated_at", null: false
+    t.index ["department_id", "title"], name: "index_positions_on_department_id_and_title", unique: true
     t.index ["department_id"], name: "index_positions_on_department_id"
-    t.index ["organization_id"], name: "index_positions_on_organization_id"
   end
 
   create_table "webhook_subscriptions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "event"
-    t.bigint "organization_id", null: false
     t.datetime "updated_at", null: false
     t.string "url"
-    t.index ["organization_id"], name: "index_webhook_subscriptions_on_organization_id"
   end
 
   add_foreign_key "attendance_records", "employees"
-  add_foreign_key "attendance_records", "organizations"
   add_foreign_key "departments", "employees", column: "manager_id"
-  add_foreign_key "departments", "organizations"
   add_foreign_key "employees", "departments"
   add_foreign_key "employees", "employees", column: "manager_id"
-  add_foreign_key "employees", "organizations"
   add_foreign_key "employees", "positions"
   add_foreign_key "leave_requests", "employees"
-  add_foreign_key "leave_requests", "organizations"
   add_foreign_key "payslips", "employees"
-  add_foreign_key "payslips", "organizations"
   add_foreign_key "positions", "departments"
-  add_foreign_key "positions", "organizations"
-  add_foreign_key "webhook_subscriptions", "organizations"
 end
