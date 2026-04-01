@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_01_063623) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_01_165020) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -101,6 +101,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_063623) do
     t.index ["department_id"], name: "index_positions_on_department_id"
   end
 
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.bigint "employee_id", null: false
+    t.string "encrypted_password"
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.index ["employee_id"], name: "index_users_on_employee_id"
+  end
+
   create_table "webhook_subscriptions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "event"
@@ -116,4 +126,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_063623) do
   add_foreign_key "leave_requests", "employees"
   add_foreign_key "payslips", "employees"
   add_foreign_key "positions", "departments"
+  add_foreign_key "users", "employees"
 end
