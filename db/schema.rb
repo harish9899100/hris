@@ -102,12 +102,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_165020) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.string "api_key"
     t.datetime "created_at", null: false
     t.string "email"
     t.bigint "employee_id", null: false
-    t.string "encrypted_password"
-    t.string "name"
+    t.string "encrypted_password", null: false
+    t.string "name", null: false
     t.datetime "updated_at", null: false
+    t.index ["api_key"], name: "index_users_on_api_key", unique: true
+    t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["employee_id"], name: "index_users_on_employee_id"
   end
 
