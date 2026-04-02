@@ -1,5 +1,5 @@
 class Department < ApplicationRecord
-  included TenantScoped
+  include TenantScoped
   belongs_to :manager, class_name: 'Employee', optional: true
   has_many :positions, dependent: :destroy
   has_many :employees, dependent: :nullify

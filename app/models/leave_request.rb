@@ -1,12 +1,11 @@
 class LeaveRequest < ApplicationRecord
-  included TenantScoped
+  include TenantScoped
   belongs_to :employee
   belongs_to :approved_by, class_name: 'User', optional: true
-  enum leave_type: { annual: 0, sick: 1, unpaid: 2, other: 3}
-  enum status: {pending: 0, approved: 1, rejected: 2, cancelled: 3}
+  enum :leave_type, { annual: 0, sick: 1, unpaid: 2, other: 3}
+  enum :status, {pending: 0, approved: 1, rejected: 2, cancelled: 3}
   validates :start_date, :end_date, :leave_type, presence: true
-  validates :end_date_after_start_date
-  belongs_to :organization
+  validate :end_date_after_start_date
   private
   def end_date_after_start_date
     return unless start_date && end_date

@@ -1,5 +1,4 @@
 class WebhookSubscription < ApplicationRecord
-  included TenantScoped
+  include TenantScoped
   validates :url, :event, presence: true
-  belongs_to :organization
 end

@@ -3,6 +3,9 @@ module TenantScoped
 
   included do
     belongs_to :organization
-    default_scope { where(organization: Current.organization) if Current.organization.present? }
+
+    default_scope do
+      Current.organization.present? ? where(organization: Current.organization) : all
+    end
   end
 end
