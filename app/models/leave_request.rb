@@ -1,11 +1,21 @@
 class LeaveRequest < ApplicationRecord
   include TenantScoped
+  include Ransackable
   belongs_to :employee
   belongs_to :approved_by, class_name: 'User', optional: true
   enum :leave_type, { annual: 0, sick: 1, unpaid: 2, other: 3}
   enum :status, {pending: 0, approved: 1, rejected: 2, cancelled: 3}
   validates :start_date, :end_date, :leave_type, presence: true
   validate :end_date_after_start_date
+
+    def self.ransackable_attributes(auth_object = nil)
+    [
+      "created_at", "employee_id", "approved_by_id", "start_date", "end_date", "leave_type", "status", "reason", "id", "updated_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["employee", "approved_by"]
+  end
   private
   def end_date_after_start_date
     return unless start_date && end_date
