@@ -5,4 +5,7 @@ class Department < ApplicationRecord
   has_many :employees, dependent: :nullify
   belongs_to :organization
   validates :name, presence: true
+  def self.ransackable_attributes(auth_object = nil)
+    ["created_at", "description", "id", "manager_id", "name", "updated_at"]
+  end
 end
