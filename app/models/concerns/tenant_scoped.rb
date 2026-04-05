@@ -5,7 +5,11 @@ module TenantScoped
     belongs_to :organization
 
     default_scope do
-      Current.organization.present? ? where(organization: Current.organization) : all
+      if Current.organization.present?
+        where(organization: Current.organization)
+      else
+        none
+      end
     end
   end
 end

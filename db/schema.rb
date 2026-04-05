@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_03_101722) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_05_052945) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -46,10 +46,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_101722) do
     t.datetime "created_at", null: false
     t.date "date"
     t.bigint "employee_id", null: false
+    t.bigint "organization_id", null: false
     t.integer "status"
     t.datetime "updated_at", null: false
     t.index ["employee_id", "date"], name: "index_attendance_records_on_employee_id_and_date", unique: true
     t.index ["employee_id"], name: "index_attendance_records_on_employee_id"
+    t.index ["organization_id"], name: "index_attendance_records_on_organization_id"
   end
 
   create_table "departments", force: :cascade do |t|
@@ -57,9 +59,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_101722) do
     t.text "description"
     t.bigint "manager_id"
     t.string "name"
+    t.bigint "organization_id", null: false
     t.datetime "updated_at", null: false
     t.index ["manager_id"], name: "index_departments_on_manager_id"
     t.index ["name"], name: "index_departments_on_name", unique: true
+    t.index ["organization_id"], name: "index_departments_on_organization_id"
   end
 
   create_table "employees", force: :cascade do |t|
@@ -72,6 +76,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_101722) do
     t.string "first_name"
     t.string "last_name"
     t.bigint "manager_id"
+    t.bigint "organization_id", null: false
     t.string "phone"
     t.bigint "position_id", null: false
     t.decimal "salary"
@@ -80,19 +85,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_101722) do
     t.index ["email"], name: "index_employees_on_email", unique: true
     t.index ["employee_id"], name: "index_employees_on_employee_id", unique: true
     t.index ["manager_id"], name: "index_employees_on_manager_id"
+    t.index ["organization_id"], name: "index_employees_on_organization_id"
     t.index ["position_id"], name: "index_employees_on_position_id"
   end
 
   create_table "leave_requests", force: :cascade do |t|
+    t.bigint "approved_by_id"
     t.datetime "created_at", null: false
     t.bigint "employee_id", null: false
     t.date "end_date"
     t.string "leave_type"
+    t.bigint "organization_id", null: false
     t.text "reason"
     t.date "start_date"
     t.integer "status"
     t.datetime "updated_at", null: false
+    t.index ["approved_by_id"], name: "index_leave_requests_on_approved_by_id"
     t.index ["employee_id"], name: "index_leave_requests_on_employee_id"
+    t.index ["organization_id"], name: "index_leave_requests_on_organization_id"
   end
 
   create_table "organizations", force: :cascade do |t|
@@ -122,10 +132,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_101722) do
     t.datetime "created_at", null: false
     t.bigint "department_id", null: false
     t.integer "employment_type"
+    t.bigint "organization_id", null: false
     t.string "title"
     t.datetime "updated_at", null: false
     t.index ["department_id", "title"], name: "index_positions_on_department_id_and_title", unique: true
     t.index ["department_id"], name: "index_positions_on_department_id"
+    t.index ["organization_id"], name: "index_positions_on_organization_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -153,12 +165,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_101722) do
   end
 
   add_foreign_key "attendance_records", "employees"
+  add_foreign_key "attendance_records", "organizations"
   add_foreign_key "departments", "employees", column: "manager_id"
+  add_foreign_key "departments", "organizations"
   add_foreign_key "employees", "departments"
   add_foreign_key "employees", "employees", column: "manager_id"
+  add_foreign_key "employees", "organizations"
   add_foreign_key "employees", "positions"
   add_foreign_key "leave_requests", "employees"
+  add_foreign_key "leave_requests", "organizations"
+  add_foreign_key "leave_requests", "users", column: "approved_by_id"
   add_foreign_key "payslips", "employees"
   add_foreign_key "positions", "departments"
+  add_foreign_key "positions", "organizations"
   add_foreign_key "users", "employees"
 end

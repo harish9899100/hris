@@ -15,7 +15,7 @@ ActiveAdmin.register Organization do
   #   permitted
   # end
 
-  permit_params :name, :slug, :setting
+  permit_params :name, :slug, :settings
 
   index do
     selectable_column
@@ -36,8 +36,8 @@ ActiveAdmin.register Organization do
     f.inputs do
       f.input :name
       f.input :slug
-      f.input :setting
-      #f.input :password_confirmation
+      f.input :settings
+      f.input :password_confirmation
     end
     f.actions
   end

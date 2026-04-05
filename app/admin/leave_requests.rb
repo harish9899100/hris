@@ -5,7 +5,7 @@ ActiveAdmin.register LeaveRequest do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-  permit_params :employee_id, :leave_type, :start_date, :end_date, :status, :reason
+  permit_params :employee_id, :leave_type, :start_date, :end_date, :status, :approved_by_id, :reason
   #
   # or
   #
@@ -40,8 +40,8 @@ ActiveAdmin.register LeaveRequest do
     f.inputs "Leave Request Details" do
       f.input :employee, collection: Employee.all.map { |e| [e.full_name, e.id] }
       f.input :leave_type, as: :select, collection: LeaveRequest.leave_types.keys
-      f.input :start_date
-      f.input :end_date
+      f.input :start_date, as: :datepicker
+      f.input :end_date, as: :datepicker
       f.input :status, as: :select, collection: LeaveRequest.statuses.keys
       f.input :approved_by, collection: User.all.map { |u| [u.email, u.id] }
       f.input :reason
