@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  employee: one
+  month: 1
+  year: 1
+  gross: 9.99
+  deductions: 9.99
+  net: 9.99
+  organization: one
+
+two:
+  employee: two
+  month: 1
+  year: 1
+  gross: 9.99
+  deductions: 9.99
+  net: 9.99
+  organization: two
