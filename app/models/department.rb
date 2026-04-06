@@ -3,6 +3,12 @@ class Department < ApplicationRecord
   belongs_to :manager, class_name: 'Employee', optional: true
   has_many :positions, dependent: :destroy
   has_many :employees, dependent: :nullify
-  belongs_to :organization
   validates :name, presence: true
+  def self.ransackable_attributes(auth_object = nil)
+    ["created_at", "description", "id", "manager_id", "name", "updated_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["employees", "manager", "organization", "positions"]
+  end
 end
