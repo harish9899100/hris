@@ -14,6 +14,13 @@ ActiveAdmin.register Employee do
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
+  menu priority: 2, label: "Employees"
+
+  scope :all, default: true
+  scope("Active")     { |q| q.where(employment_status: :active) }
+  scope("On Leave")   { |q| q.where(employment_status: :on_leave) }
+  scope("Terminated") { |q| q.where(employment_status: :terminated) }
+
   index do
     selectable_column
     id_column
@@ -28,7 +35,6 @@ ActiveAdmin.register Employee do
     column :employment_status
     column :salary
     column :phone
-    #column :status
     column :created_at
     actions
   end
@@ -37,13 +43,12 @@ ActiveAdmin.register Employee do
   filter :first_name
   filter :last_name
   filter :email
-  filter :department
-  filter :position
+  filter :department, as: :select, collection: -> { Department.all.map { |d| [d.name, d.id] } }
+  filter :position, as: :select, collection: -> { Position.all.map { |p| [p.title, p.id] } }
   filter :manager
   filter :date_of_joining
-  filter :employment_status
+  filter :employment_status, as: :select, collection: Employee.employment_statuses.keys.map { |s| [s.humanize, s] }
   filter :salary
-  #filter :status
   filter :created_at
 
   form do |f|
@@ -59,7 +64,6 @@ ActiveAdmin.register Employee do
       f.input :employment_status, as: :select, collection: Employee.employment_statuses.keys
       f.input :salary
       f.input :phone
-      #f.input :status, as: :select, collection: Employee.statuses.keys
     end
     f.actions
   end
@@ -78,7 +82,6 @@ ActiveAdmin.register Employee do
       row :employment_status
       row :salary
       row :phone
-      #row :status
       row :created_at
       row :updated_at
     end
