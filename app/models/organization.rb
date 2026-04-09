@@ -1,4 +1,5 @@
 class Organization < ApplicationRecord
+  has_many :organization_holidays, dependent: :destroy
   has_many :departments, dependent: :destroy
   has_many :positions, dependent: :destroy
   has_many :employees, dependent: :destroy
