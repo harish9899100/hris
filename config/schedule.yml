@@ -1,0 +1,5 @@
+mark_absent_job:
+  cron: "0 20 * * 1-5"  
+  class: "MarkAbsentJob"
+  queue: default
+  description: "Auto-mark absent employees at end of working day"

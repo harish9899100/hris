@@ -43,11 +43,34 @@ ActiveAdmin.register_page "Dashboard" do
 
     columns do
       column do
+        panel "Today's Attendance Snapshot — #{Date.today.strftime('%d %b %Y')}" do
+          summary = AttendanceRecord.today_summary
+
+          div style: "display: flex; gap: 30px; padding: 10px 0;" do
+            [
+              ["Present",    summary[:present],    "#27ae60"],
+              ["Absent",     summary[:absent],     "#e74c3c"],
+              ["On Leave",   summary[:on_leave],   "#2980b9"],
+              ["Incomplete", summary[:incomplete], "#f39c12"],
+              ["Late",       summary[:late],       "#e67e22"]
+            ].each do |label, count, color|
+              div style: "text-align: center;" do
+                h3 count.to_s, style: "color: #{color}; font-size: 32px; margin: 0;"
+                para label, style: "color: #666; margin: 4px 0 0;"
+              end
+            end
+          end
+        end
+      end
+    end
+
+    columns do
+      column do
         panel "Recently Joined Employees" do
           table_for Employee.order(date_of_joining: :desc).limit(8) do
             column("Name")       { |e| link_to e.full_name, admin_employee_path(e) }
-            column("Department") { |e| e.department.name }
-            column("Position")   { |e| e.position.title }
+            column("Department") { |e| e.department&.name || "-" }
+            column("Position")   { |e| e.position&.title || "-" }
             column("Joined")     { |e| e.date_of_joining.strftime("%d %b %Y") }
             column("Status")     { |e| status_tag e.employment_status }
           end
