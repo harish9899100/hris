@@ -86,4 +86,26 @@ ActiveAdmin.register Employee do
       row :updated_at
     end
   end
+  controller do
+    include Pundit::Authorization
+
+    def scoped_collection
+      policy_scope(Employee)
+    end
+
+    def create
+      authorize resource_class
+      super
+    end
+
+    def update
+      authorize resource
+      super
+    end
+
+    def destroy
+      authorize resource
+      super
+    end
+  end
 end

@@ -42,8 +42,24 @@ ActiveAdmin.register Department do
     f.actions
   end
   controller do
+    include Pundit::Authorization
     def scoped_collection
+      policy_scope(Department)
       super.includes(:manager)
+    end
+    def create
+      authorize resource_class
+      super
+    end
+
+    def update
+      authorize resource
+      super
+    end
+
+    def destroy
+      authorize resource
+      super
     end
   end
 end

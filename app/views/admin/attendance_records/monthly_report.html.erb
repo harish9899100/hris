@@ -1,0 +1,50 @@
+<div class="panel">
+  <h3>Monthly Attendance Report</h3>
+
+  <%= form_tag monthly_report_admin_attendance_records_path, method: :get do %>
+    <div style="margin-bottom: 15px;">
+      <%= label_tag :month, "Select Month:" %>
+      <%= month_field_tag :month, @month.strftime("%Y-%m"), style: "margin-left: 8px;" %>
+      <%= submit_tag "View Report", class: "button" %>
+    </div>
+  <% end %>
+
+  <table class="index_table">
+    <thead>
+      <tr>
+        <th>Employee</th>
+        <th>Department</th>
+        <th>Working Days</th>
+        <th>Present</th>
+        <th>Absent</th>
+        <th>On Leave</th>
+        <th>Attendance %</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @employees.each do |employee| %>
+        <% records         = (@records[employee.id] || []) %>
+        <% total_days      = records.count %>
+        <% present_days    = records.count { |r| r.status == "present" || r.status == "half_day" } %>
+        <% absent_days     = records.count { |r| r.status == "absent" } %>
+        <% leave_days      = records.count { |r| r.status == "on_leave" } %>
+        <%# late_days       = records.count(&:late) %>
+        <% attendance_pct  = total_days > 0 ? ((present_days.to_f / total_days) * 100).round(1) : 0 %>
+        <tr>
+          <td><%= link_to employee.full_name, admin_employee_path(employee) %></td>
+          <td><%= employee.department.name %></td>
+          <td><%= total_days %></td>
+          <td><%= present_days %></td>
+          <td><%= absent_days %></td>
+          <td><%= leave_days %></td>
+          <td><%#= late_days %></td>
+          <td>
+            <span style="color: <%= attendance_pct >= 80 ? 'green' : 'red' %>">
+              <%= attendance_pct %>%
+            </span>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

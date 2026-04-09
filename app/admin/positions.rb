@@ -57,8 +57,22 @@ ActiveAdmin.register Position do
   end
 
   controller do
+    include Pundit::Authorization
     def scoped_collection
+      policy_scope(Position)
       super.includes(:department)
+    end
+    def create
+      authorize resource_class
+      super
+    end
+    def update
+      authorize resource_class
+      super
+    end
+    def destroy
+      authorize resource
+      super
     end
   end
 end
