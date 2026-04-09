@@ -92,3 +92,5 @@ group :test do
   gem 'simplecov'
   gem 'shoulda-matchers'
 end
+
+gem "tailwindcss-rails", "~> 4.4"

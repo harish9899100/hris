@@ -1,0 +1,12 @@
+<h1>Dashboard</h1>
+
+<p>Total Employees: <%= @employees_count %></p>
+<p>Present Today: <%= @present_today %></p>
+<p>Pending Leaves: <%= @pending_leaves %></p>
+
+<h3>My Recent Attendance</h3>
+<ul>
+  <% @my_attendance.each do |a| %>
+    <li><%= a.date %> - <%= a.status %></li>
+  <% end %>
+</ul>
