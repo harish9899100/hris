@@ -1,0 +1,21 @@
+<h1>Attendance</h1>
+
+<%= button_to "Clock In / Out", attendance_records_path, method: :post %>
+
+<table>
+  <tr>
+    <th>Date</th>
+    <th>Status</th>
+    <th>Check In</th>
+    <th>Check Out</th>
+  </tr>
+
+  <% @attendance_records.each do |a| %>
+    <tr>
+      <td><%= a.date %></td>
+      <td><%= a.status %></td>
+      <td><%= a.check_in %></td>
+      <td><%= a.check_out %></td>
+    </tr>
+  <% end %>
+</table>
