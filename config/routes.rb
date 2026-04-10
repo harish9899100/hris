@@ -1,10 +1,10 @@
 Rails.application.routes.draw do
   get "profiles/show"
+  resources :dashboards
   resources :payslips, only: [:index, :show]
   resources :leave_requests
   resources :attendance_records
-  get "employees/index"
-  get "dashboards/index"
+  resources :employees
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
   devise_for :users

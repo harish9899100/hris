@@ -1,0 +1,56 @@
+<%= form_with(model: employee, local: true) do |f| %>
+
+  <div>
+    <%= f.label :first_name %>
+    <%= f.text_field :first_name %>
+  </div>
+
+  <div>
+    <%= f.label :last_name %>
+    <%= f.text_field :last_name %>
+  </div>
+
+  <div>
+    <%= f.label :phone %>
+    <%= f.text_field :phone %>
+  </div>
+
+  <% if current_user.present? %>
+    
+    <div>
+      <%= f.label :email %>
+      <%= f.email_field :email %>
+    </div>
+
+    <div>
+      <%= f.label :department_id %>
+      <%= f.collection_select :department_id, Department.all, :id, :name %>
+    </div>
+
+    <div>
+      <%= f.label :position_id %>
+      <%= f.collection_select :position_id, Position.all, :id, :title %>
+    </div>
+
+    <div>
+      <%= f.label :manager_id %>
+      <%= f.collection_select :manager_id, Employee.all, :id, :first_name %>
+    </div>
+
+    <div>
+      <%= f.label :employment_status %>
+      <%= f.select :employment_status, Employee.employment_statuses.keys %>
+    </div>
+
+    <div>
+      <%= f.label :salary %>
+      <%= f.number_field :salary %>
+    </div>
+
+  <% end %>
+
+  <div>
+    <%= f.submit "Update Profile" %>
+  </div>
+
+<% end %>
