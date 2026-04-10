@@ -1,0 +1,17 @@
+<h1>Employees</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Department</th>
+    <th>Status</th>
+  </tr>
+
+  <% @employee.each do |emp| %>
+    <tr>
+      <td><%= emp.first_name %></td>
+      <td><%= emp.department.name %></td>
+      <td><%= emp.employment_status %></td>
+    </tr>
+  <% end %>
+</table>
