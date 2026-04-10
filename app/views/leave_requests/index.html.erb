@@ -1,0 +1,23 @@
+<h1>My Leave Requests</h1>
+
+<%= link_to "Apply Leave", new_leave_request_path %>
+
+<table border="1" cellpadding="8">
+  <tr>
+    <th>Start Date</th>
+    <th>End Date</th>
+    <th>Type</th>
+    <th>Status</th>
+    <th>Reason</th>
+  </tr>
+
+  <% @leave_requests.each do |leave| %>
+    <tr>
+      <td><%= leave.start_date %></td>
+      <td><%= leave.end_date %></td>
+      <td><%= leave.leave_type %></td>
+      <td><%= leave.status %></td>
+      <td><%= leave.reason %></td>
+    </tr>
+  <% end %>
+</table>

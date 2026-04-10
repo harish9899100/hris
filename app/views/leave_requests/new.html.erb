@@ -1,0 +1,33 @@
+<h1>Apply for Leave</h1>
+
+<%= form_with model: @leave_request, local: true do |f| %>
+
+  <div>
+    <%= f.label :start_date %><br>
+    <%= f.date_field :start_date %>
+  </div>
+
+  <div>
+    <%= f.label :end_date %><br>
+    <%= f.date_field :end_date %>
+  </div>
+
+  <div>
+    <%= f.label :leave_type %><br>
+    <%= f.select :leave_type, ["annual", "sick", "casual"] %>
+  </div>
+
+  <div>
+    <%= f.label :reason %><br>
+    <%= f.text_area :reason %>
+  </div>
+
+  <div>
+    <%= f.submit "Apply Leave" %>
+  </div>
+
+<% end %>
+
+<br>
+
+<%= link_to "Back", leave_requests_path %>

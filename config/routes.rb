@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :leave_requests
   resources :attendance_records
   get "employees/index"
   get "dashboards/index"
