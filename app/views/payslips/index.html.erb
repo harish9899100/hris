@@ -1,0 +1,7 @@
+<h1>My Payslips</h1>
+
+<% @payslips.each do |p| %>
+  <p>
+    <%= link_to "#{p.month}/#{p.year}", payslip_path(p) %>
+  </p>
+<% end %>

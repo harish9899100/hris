@@ -1,0 +1,41 @@
+<h1>Payslip Details</h1>
+
+<hr>
+
+<p>
+  <strong>Employee:</strong>
+  <%= @payslip.employee.full_name %>
+</p>
+
+<p>
+  <strong>Month:</strong>
+  <%= Date::MONTHNAMES[@payslip.month] %>
+</p>
+
+<p>
+  <strong>Year:</strong>
+  <%= @payslip.year %>
+</p>
+
+<hr>
+
+<h3>Salary Breakdown</h3>
+
+<p>
+  <strong>Gross Salary:</strong>
+  ₹ <%= @payslip.gross %>
+</p>
+
+<p>
+  <strong>Deductions:</strong>
+  ₹ <%= @payslip.deductions %>
+</p>
+
+<p>
+  <strong>Net Salary:</strong>
+  ₹ <%= @payslip.net %>
+</p>
+
+<hr>
+
+<%= link_to "Back to Payslips", payslips_path %>

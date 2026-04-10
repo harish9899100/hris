@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :payslips, only: [:index, :show]
   resources :leave_requests
   resources :attendance_records
   get "employees/index"
