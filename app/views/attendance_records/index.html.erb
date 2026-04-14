@@ -1,21 +1,35 @@
-<h1>Attendance</h1>
+<h2>Todays Attendance</h2>
 
-<%= button_to "Clock In / Out", attendance_records_path, method: :post %>
-
-<table>
-  <tr>
-    <th>Date</th>
-    <th>Status</th>
-    <th>Check In</th>
-    <th>Check Out</th>
-  </tr>
-
-  <% @attendance_records.each do |a| %>
+<table class="table table-bordered">
+  <thead>
     <tr>
-      <td><%= a.date %></td>
-      <td><%= a.status %></td>
-      <td><%= a.check_in %></td>
-      <td><%= a.check_out %></td>
+      <th>Employee</th>
+      <th>Date</th>
+      <th>Check In</th>
+      <th>Check Out</th>
+      <th>Hours</th>
+      <th>Status</th>
+      <th>Late?</th>
     </tr>
-  <% end %>
+  </thead>
+
+  <tbody>
+    <% @attendance_records.each do |record| %>
+      <tr>
+        <td><%= record.employee.first_name %></td>
+        <td><%= record.date %></td>
+        <td><%= record.check_in&.strftime("%I:%M %p") %></td>
+        <td><%= record.check_out&.strftime("%I:%M %p") %></td>
+        <td><%= record.hours_worked %></td>
+        <td><%= record.status.humanize %></td>
+        <td>
+          <% if record.late? %>
+            <span>Late</span>
+          <% else %>
+            On Time
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
 </table>

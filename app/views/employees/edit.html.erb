@@ -1,5 +1,6 @@
-<h1>Edit My Profile</h1>
-
-<%= render "form", employee: @employee %>
-
-<%= link_to "Back", employee_path(@employee) %>
+<div class="max-w-4xl mx-auto p-6">
+  <h1 class="text-2xl font-bold mb-4">Edit Employee</h1>
+  <div class="bg-white p-6 rounded-xl shadow">
+    <%= render "form" %>
+  </div>
+</div>

@@ -1,12 +1,18 @@
-<h1>Dashboard</h1>
+<h2>Dashboard</h2>
 
-<p>Total Employees: <%= @employees_count %></p>
-<p>Present Today: <%= @present_today %></p>
-<p>Pending Leaves: <%= @pending_leaves %></p>
+<p>Total Employees: <%= @stats[:total_employees] || 0 %></p>
+<p>Present Today: <%= @stats[:present_today] || 0 %></p>
+<p>Pending Leaves: <%= @stats[:pending_leaves] || 0 %></p>
 
 <h3>My Recent Attendance</h3>
-<ul>
-  <% @my_attendance.each do |a| %>
-    <li><%= a.date %> - <%= a.status %></li>
-  <% end %>
-</ul>
+
+<% if @my_attendance.present? %>
+  <ul>
+    <% @my_attendance.each do |a| %>
+      <li><%= a.date %> - <%= a.status %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No attendance records</p>
+<%= link_to "Logout", destroy_user_session_path, method: :delete %>
+<% end %>

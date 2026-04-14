@@ -1,0 +1,25 @@
+<h2> Monthly Attendance</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Check In</th>
+      <th>Check Out</th>
+      <th>Hours</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @records.each do |rec| %>
+      <tr>
+        <td><%= rec.date %></td>
+        <td><%= rec.check_in&.strftime("%I:%M %p") %></td>
+        <td><%= rec.check_out&.strftime("%I:%M %p") %></td>
+        <td><%= rec.hours_worked %></td>
+        <td><%= rec.status.humanize %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

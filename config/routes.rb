@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  get "profiles/show"
+  devise_for :employees
+  #get "profiles/show"
   resources :dashboards
   resources :payslips, only: [:index, :show]
   resources :leave_requests
@@ -8,7 +9,7 @@ Rails.application.routes.draw do
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
   devise_for :users
-  get "homes/index"
+  get "dashboards/index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -20,5 +21,5 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  root "homes#index"
+  root "dashboards#index"
 end

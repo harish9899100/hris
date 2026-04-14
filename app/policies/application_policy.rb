@@ -47,7 +47,7 @@ class ApplicationPolicy
   end
 
   def employee_role?
-    user.present? && user.employee?
+    user.present? && user.employee.present?
   end
 
   def hr_or_above?
@@ -89,7 +89,7 @@ class ApplicationPolicy
     end
 
     def employee_role?
-      user.present? && user.employee?
+      user.present? && user.employee.present?
     end
 
     def hr_or_above?

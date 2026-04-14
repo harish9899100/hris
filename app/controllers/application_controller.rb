@@ -1,35 +1,42 @@
 class ApplicationController < ActionController::Base
   include Pundit::Authorization
+
+  before_action :authenticate_user!, unless: :active_admin_controller?
   before_action :set_current_organization
+  after_action :verify_pundit_authorization
 
-  rescue_from Pundit::NotAuthorizedError, with: :handle_not_authorized
-  rescue_from ActiveAdmin::AccessDenied, with: :handle_not_authorized
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
-  # Changes to the importmap will invalidate the etag for HTML responses
-  stale_when_importmap_changes
   private
-  def set_current_organization
-    Current.organization = Organization.first
+  def user_not_authorized
+    flash[:alert] = "You are not authorized to perform this action."
+    redirect_back(fallback_location: root_path)
+  end
+
+  def skip_pundit?
+    devise_controller? || is_a?(ActiveAdmin::BaseController)
+  end
+
+  def active_admin_controller?
+    is_a?(ActiveAdmin::BaseController)
   end
 
   def set_current_organization
-    Current.organization = Organization.first
-  end
-
-  def handle_not_authorized(exception)
-    flash[:alert] = exception.message.presence || "You are not authorized to perform this action."
-
     if current_admin_user.present?
-      redirect_to destroy_admin_user_session_path, allow_other_host: false
-    else
-      redirect_to root_path
+      Current.organization = Organization.first
+    elsif user_signed_in?
+      Current.organization = current_user.organization
     end
   end
+  def verify_pundit_authorization
+    return if devise_controller?
+    return if active_admin_controller?
+    return if current_admin_user.present?  
 
-  # def user_not_authorized
-  #   flash[:alert] = "You are not authorized to perform this action."
-  #   redirect_back(fallback_location: admin_root_path)
-  # end
+    if action_name == "index"
+      verify_policy_scoped
+    else
+      verify_authorized
+    end
+  end
 end
