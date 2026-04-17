@@ -1,69 +1,124 @@
-<div class="max-w-7xl mx-auto p-6">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold">Employees</h1>
-    <%= link_to "Add Employee", new_employee_path, class: "bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700" %>
+<% content_for :title, "Employees" %>
+<% content_for :breadcrumbs do %>
+  <span class="breadcrumb-item">Employees</span>
+<% end %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Employees</h1>
+    <p class="page-subtitle"><%= @employees.total_count %> total employees</p>
   </div>
+  <div class="page-actions">
+    <% if policy(Employee).create? %>
+      <%= link_to new_employee_path, class: "btn btn-primary" do %>
+        + New Employee
+      <% end %>
+    <% end %>
+  </div>
+</div>
 
-  <div class="bg-white p-4 rounded-xl shadow mb-6">
-    <%= form_with url: employees_path, method: :get, local: true, class: "grid grid-cols-1 md:grid-cols-4 gap-4" do %>
+<div class="filter-bar">
+  <%= form_tag employees_path, method: :get, class: "filter-form" do %>
+    
+    <div class="filter-group">
+      <%= text_field_tag :q, params[:q], placeholder: "Search name or email…",
+            class: "form-control form-control--sm" %>
+    </div>
 
-      <%= text_field_tag :q, params[:q], placeholder: "Search employee...", class: "border rounded-lg px-3 py-2 w-full" %>
-
+    <div class="filter-group">
       <%= select_tag :department_id,
             options_from_collection_for_select(@departments, :id, :name, params[:department_id]),
             include_blank: "All Departments",
-            class: "border rounded-lg px-3 py-2 w-full" %>
+            class: "form-select form-select--sm" %>
+    </div>
 
-      <%= select_tag :status,
-            options_for_select(Employee.employment_statuses.keys.map { |s| [s.titleize, s] }, params[:status]),
-            include_blank: "All Status",
-            class: "border rounded-lg px-3 py-2 w-full" %>
+    <div class="filter-group">
+      <%= select_tag :employment_status,
+            options_for_select([
+              ["All Status", ""],
+              ["Active", "active"],
+              ["On Leave", "on_leave"],
+              ["Terminated", "terminated"]
+            ], params[:employment_status]),
+            class: "form-select form-select--sm" %>
+    </div>
 
-      <%= submit_tag "Filter", class: "bg-gray-800 text-white rounded-lg px-4 py-2 hover:bg-gray-900" %>
+    <%= submit_tag "Filter", class: "btn btn-outline btn-sm" %>
 
+    <% if params[:q].present? || params[:department_id].present? || params[:employment_status].present? %>
+      <%= link_to "Clear", employees_path, class: "btn btn-ghost btn-sm" %>
     <% end %>
-  </div>
 
-  <div class="bg-white rounded-xl shadow overflow-x-auto">
-    <table class="min-w-full text-sm">
-      <thead class="bg-gray-100 text-gray-700">
-        <tr>
-          <th class="px-4 py-3 text-left">Name</th>
-          <th class="px-4 py-3">Department</th>
-          <th class="px-4 py-3">Position</th>
-          <th class="px-4 py-3">Status</th>
-          <th class="px-4 py-3">Actions</th>
-        </tr>
-      </thead>
+  <% end %>
+</div>
 
-      <tbody>
-        <% @employees.each do |emp| %>
-          <tr class="border-t hover:bg-gray-50">
-            <td class="px-4 py-3 font-medium">
-              <%= link_to emp.full_name, emp, class: "text-blue-600 hover:underline" %>
-            </td>
-
-            <td class="px-4 py-3"><%= emp.department&.name %></td>
-            <td class="px-4 py-3"><%= emp.position&.title %></td>
-
-            <td class="px-4 py-3">
-              <span class="px-2 py-1 rounded-full text-xs
-                <%= emp.active? ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' %>">
-                <%= emp.employment_status.titleize %>
-              </span>
-            </td>
-
-            <td class="px-4 py-3 space-x-2">
-              <%= link_to "View", emp, class: "text-blue-600 hover:underline" %>
-              <%= link_to "new", new_employee_path %>
-              <%= link_to "Attendance Records", attendance_records_path %>
-            </td>
+<div class="card">
+  <div class="card-body p-0">
+    <% if @employees.any? %>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Department</th>
+            <th>Position</th>
+            <th>Date of Joining</th>
+            <th>Status</th>
+            <th class="col-actions">Actions</th>
           </tr>
+        </thead>
+        <tbody>
+          <% @employees.each do |employee| %>
+            <tr>
+              <td>
+                <%= link_to employee_path(employee), class: "employee-cell" do %>
+                  <div class="avatar-sm">
+                    <%= employee.first_name&.first %><%= employee.last_name&.first %>
+                  </div>
+                  <div>
+                    <div class="employee-name">
+                      <%= employee.full_name %>
+                    </div>
+                    <div class="employee-email text-muted">
+                      <%= employee.email %>
+                    </div>
+                  </div>
+                <% end %>
+              </td>
+
+              <td><%= employee.department&.name || "—" %></td>
+              <td><%= employee.position&.title || "—" %></td>
+
+              <td>
+                <%= employee.date_of_joining&.strftime("%b %-d, %Y") || "—" %>
+              </td>
+
+              <td><%= employee.employment_status %></td>
+
+              <td class="action-btns">
+                <%= link_to "View", employee_path(employee), class: "btn btn-xs btn-outline" %>
+
+                <% if policy(employee).update? %>
+                  <%= link_to "Edit", edit_employee_path(employee), class: "btn btn-xs btn-ghost" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <div class="pagination-wrap">
+        <%= paginate @employees %>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <div class="empty-icon"></div>
+        <h3>No employees found</h3>
+        <p>Try adjusting your filters or add a new employee.</p>
+
+        <% if policy(Employee).create? %>
+          <%= link_to "Add Employee", new_employee_path, class: "btn btn-primary" %>
         <% end %>
-      </tbody>
-    </table>
-  </div>
-  <div class="mt-6">
-    <%= paginate @employees %>
+      </div>
+    <% end %>
   </div>
 </div>

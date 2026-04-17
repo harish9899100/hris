@@ -1,20 +1,23 @@
 class ApplicationController < ActionController::Base
   include Pundit::Authorization
 
-  before_action :authenticate_user!, unless: :active_admin_controller?
+  before_action :authenticate_user!, unless: -> {:active_admin_controller? || is_a?(DashboardsController) || is_a?(EmployeesController) }
   before_action :set_current_organization
-  after_action :verify_pundit_authorization
+  after_action :verify_pundit_authorization, unless: :skip_pundit?
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   private
+  def pundit_user
+    current_admin_user || current_employee
+  end
   def user_not_authorized
     flash[:alert] = "You are not authorized to perform this action."
     redirect_back(fallback_location: root_path)
   end
 
   def skip_pundit?
-    devise_controller? || is_a?(ActiveAdmin::BaseController)
+    devise_controller? || is_a?(ActiveAdmin::BaseController) || current_admin_user.present?
   end
 
   def active_admin_controller?
@@ -23,11 +26,12 @@ class ApplicationController < ActionController::Base
 
   def set_current_organization
     if current_admin_user.present?
-      Current.organization = Organization.first
-    elsif user_signed_in?
-      Current.organization = current_user.organization
+      Current.organization = nil 
+    else
+      Current.organization = current_user&.organization
     end
   end
+
   def verify_pundit_authorization
     return if devise_controller?
     return if active_admin_controller?
@@ -36,7 +40,7 @@ class ApplicationController < ActionController::Base
     if action_name == "index"
       verify_policy_scoped
     else
-      verify_authorized
+      #verify_authorized
     end
   end
 end

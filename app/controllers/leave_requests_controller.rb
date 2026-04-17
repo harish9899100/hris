@@ -1,13 +1,12 @@
 class LeaveRequestsController < ApplicationController
+  before_action :authenticate_employee!
   before_action :set_leave_request, only: [:show, :edit, :update, :destroy, :approve, :reject]
 
   def index
-    @leave_requests = policy_scope(LeaveRequest).includes(:employee, :reviewer).order(created_at: :desc)
-
+    @leave_requests = policy_scope(LeaveRequest).includes(:employee).order(created_at: :desc)
     @leave_requests = @leave_requests.where(status: params[:status])          if params[:status].present?
     @leave_requests = @leave_requests.where(employee_id: params[:employee_id]) if params[:employee_id].present?
     @leave_requests = @leave_requests.where(leave_type: params[:leave_type])   if params[:leave_type].present?
-
     @employees      = policy_scope(Employee).active.order(:last_name)
     @pending_count  = policy_scope(LeaveRequest).pending.count
     @leave_requests = @leave_requests.page(params[:page]).per(20)
@@ -26,13 +25,16 @@ class LeaveRequestsController < ApplicationController
 
   def create
     @leave_request = LeaveRequest.new(leave_request_params)
-    @leave_request.organization = Current.organization
+    @leave_request.employee = current_employee
+    @leave_request.organization = Current.organization || Organization.first
     authorize @leave_request
 
     if @leave_request.save
       LeaveRequestMailer.submission_notification(@leave_request).deliver_later rescue nil
       redirect_to @leave_request, notice: "Leave request submitted successfully."
     else
+      flash.now[:error] = @leave_request.errors.full_messages.join(", ")
+      puts @leave_request.errors.full_messages
       @employees = policy_scope(Employee).active.order(:last_name)
       render :new, status: :unprocessable_entity
     end
@@ -105,7 +107,7 @@ class LeaveRequestsController < ApplicationController
   end
 
   def current_employee_id
-    current_user.employee&.id
+    current_employee&.id
   end
 
   def leave_request_params

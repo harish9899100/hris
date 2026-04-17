@@ -1,6 +1,6 @@
 class EmployeePolicy < ApplicationPolicy
   def index?
-    manager_or_above?
+    manager_or_above? || own_record?
   end
   def show?
     manager_or_above? || own_record?

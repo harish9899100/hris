@@ -1,4 +1,5 @@
 class AttendanceRecordsController < ApplicationController
+  before_action :authenticate_employee!
   def index
     @attendance_records = current_user.employee.attendance_records.order(date: :desc)
   end

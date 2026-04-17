@@ -96,6 +96,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_071006) do
   end
 
   create_table "leave_requests", force: :cascade do |t|
+    t.bigint "approved_by_id"
     t.datetime "created_at", null: false
     t.bigint "employee_id", null: false
     t.date "end_date"
@@ -105,6 +106,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_071006) do
     t.date "start_date"
     t.integer "status"
     t.datetime "updated_at", null: false
+    t.index ["approved_by_id"], name: "index_leave_requests_on_approved_by_id"
     t.index ["employee_id"], name: "index_leave_requests_on_employee_id"
     t.index ["organization_id"], name: "index_leave_requests_on_organization_id"
   end
@@ -203,6 +205,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_071006) do
   add_foreign_key "employees", "positions"
   add_foreign_key "leave_requests", "employees"
   add_foreign_key "leave_requests", "organizations"
+  add_foreign_key "leave_requests", "users", column: "approved_by_id"
   add_foreign_key "organization_holidays", "organizations"
   add_foreign_key "payslips", "employees"
   add_foreign_key "positions", "departments"

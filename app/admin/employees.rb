@@ -1,19 +1,7 @@
 ActiveAdmin.register Employee do
 
-  # See permitted parameters documentation:
-  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-  #
-  # Uncomment all parameters which should be permitted for assignment
-  #
-  permit_params :first_name, :last_name, :email, :employee_id, :department_id, :position_id, :manager_id, :date_of_joining, :employment_status, :salary, :phone, :status
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:first_name, :last_name, :email, :employee_id, :department_id, :position_id, :manager_id, :date_of_joining, :employment_status, :salary, :phone, :status]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
+  permit_params :first_name, :last_name, :email, :employee_id, :department_id, :position_id, :manager_id, :date_of_joining, :employment_status, :salary, :phone, :status, :password, :password_confirmation
+
   menu priority: 2, label: "Employees"
 
   scope :all, default: true
@@ -57,6 +45,8 @@ ActiveAdmin.register Employee do
       f.input :first_name
       f.input :last_name
       f.input :email
+      f.input :password
+      f.input :password_confirmation
       f.input :department
       f.input :position
       f.input :manager, collection: Employee.all.map { |e| [e.full_name, e.id] }
@@ -86,26 +76,22 @@ ActiveAdmin.register Employee do
       row :updated_at
     end
   end
+
   controller do
-    include Pundit::Authorization
+    def create
+      build_resource
+      resource.organization = Organization.first 
+
+      if resource.save
+        redirect_to resource_path(resource), notice: "Employee created successfully"
+      else
+        flash[:error] = resource.errors.full_messages.join(", ")
+        render :new
+      end
+    end
 
     def scoped_collection
-      policy_scope(Employee)
-    end
-
-    def create
-      authorize resource_class
-      super
-    end
-
-    def update
-      authorize resource
-      super
-    end
-
-    def destroy
-      authorize resource
-      super
+      Employee.unscoped
     end
   end
 end

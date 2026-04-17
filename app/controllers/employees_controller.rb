@@ -1,11 +1,14 @@
 class EmployeesController < ApplicationController
-  before_action :set_employee, only: [:show, :edit, :update, :destroy, :terminate, :activate]
+    
+  before_action :authenticate_employee!
 
+
+  
   def index
     @employees = policy_scope(Employee).includes(:department, :position, :user).order(:last_name, :first_name)
-
+     
     @employees = @employees.where(department_id: params[:department_id]) if params[:department_id].present?
-    @employees = @employees.where(employment_status: params[:status])    if params[:status].present?
+    @employees = @employees.where(employment_status: params[:employment_status]) if params[:employment_status].present?
     @employees = @employees.search(params[:q])                           if params[:q].present?
 
     @departments = policy_scope(Department).order(:name)
@@ -13,13 +16,12 @@ class EmployeesController < ApplicationController
   end
 
   def show
-    authorize @employee
-
+    @employee = Employee.find(params[:id])
     @recent_attendance = @employee.attendance_records.order(date: :desc).limit(10)
 
     @leave_requests    = @employee.leave_requests.order(created_at: :desc).limit(5)
 
-    @recent_payslips   = @employee.payslips.order(pay_period_end: :desc).limit(3)
+    @recent_payslips   = @employee.payslips.limit(3)
   end
 
   def new
@@ -32,7 +34,7 @@ class EmployeesController < ApplicationController
   def create
     @employee = Employee.new(employee_params)
     @employee.organization = Current.organization
-    authorize @employee
+    authorize @employee unless current_admin_user.present?
 
     if @employee.save
       redirect_to @employee, notice: "Employee #{@employee.full_name} was successfully created."

@@ -1,18 +1,295 @@
-<h2>Dashboard</h2>
+<% content_for :title, "Dashboard" %>
 
-<p>Total Employees: <%= @stats[:total_employees] || 0 %></p>
-<p>Present Today: <%= @stats[:present_today] || 0 %></p>
-<p>Pending Leaves: <%= @stats[:pending_leaves] || 0 %></p>
-
-<h3>My Recent Attendance</h3>
-
-<% if @my_attendance.present? %>
-  <ul>
-    <% @my_attendance.each do |a| %>
-      <li><%= a.date %> - <%= a.status %></li>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle"><%= Date.current.strftime("%A, %B %-d %Y") %> &nbsp;&middot;&nbsp; <%= Current.organization&.name %></p>
+  </div>
+  <div class="page-actions">
+    <% if policy(Employee).create? %>
+      <%= link_to new_employee_path, class: "btn btn-primary" do %>
+        &#43; New Employee
+      <% end %>
     <% end %>
-  </ul>
-<% else %>
-  <p>No attendance records</p>
-<%= link_to "Logout", destroy_user_session_path, method: :delete %>
-<% end %>
+    <% if policy(LeaveRequest).create? %>
+      <%= link_to new_leave_request_path, class: "btn btn-outline" do %>
+        Leave Request
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="stats-grid">
+
+  <div class="stat-card stat-card--blue">
+    <div class="stat-icon"></div>
+    <div class="stat-body">
+      <div class="stat-value"><%= @stats[:total_employees] %></div>
+      <div class="stat-label">Active Employees</div>
+    </div>
+    <div class="stat-footer">
+      <%= link_to "View all".html_safe, employees_path(status: :active) %>
+    </div>
+  </div>
+
+  <div class="stat-card stat-card--green">
+    <div class="stat-icon"></div>
+    <div class="stat-body">
+      <div class="stat-value"><%= @stats[:present_today] %></div>
+      <div class="stat-label">Present Today</div>
+    </div>
+    <div class="stat-footer">
+      <%= link_to "Attendance".html_safe, attendance_records_path %>
+    </div>
+  </div>
+
+  <div class="stat-card stat-card--amber">
+    <div class="stat-icon"></div>
+    <div class="stat-body">
+      <div class="stat-value"><%= @stats[:on_leave_today] %></div>
+      <div class="stat-label">On Leave Today</div>
+    </div>
+    <div class="stat-footer">
+      <%= link_to "Leave".html_safe, leave_requests_path(status: :approved) %>
+    </div>
+  </div>
+
+  <div class="stat-card stat-card--red">
+    <div class="stat-icon"></div>
+    <div class="stat-body">
+      <div class="stat-value"><%= @stats[:pending_leaves] %></div>
+      <div class="stat-label">Pending Approvals</div>
+    </div>
+    <div class="stat-footer">
+      <%= link_to "Review".html_safe, leave_requests_path(status: :pending) %>
+    </div>
+  </div>
+
+</div>
+
+<div class="dashboard-grid">
+
+  <section class="card dashboard-card--wide">
+    <div class="card-header">
+      <h2 class="card-title">Recent Employees</h2>
+      <%= link_to "All Employees", employees_path, class: "card-link" %>
+    </div>
+    <div class="card-body p-0">
+      <% if @recent_employees.any? %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Department</th>
+              <th>Position</th>
+              <th>Joined</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_employees.each do |emp| %>
+              <tr>
+                <td>
+                  <%= link_to employee_path(emp), class: "employee-cell" do %>
+                    <div class="avatar-xs">
+                      <%= emp.first_name&.first&.upcase %><%= emp.last_name&.first&.upcase %>
+                    </div>
+                    <div>
+                      <div class="employee-name"><%= emp.full_name %></div>
+                      <div class="employee-email"><%= emp.email %></div>
+                    </div>
+                  <% end %>
+                </td>
+                <td><%= emp.department&.name || "—" %></td>
+                <td><%= emp.position&.title || "—" %></td>
+                <td><%= emp.created_at&.strftime("%b %-d, %Y") %></td>
+                <td><%= status_badge(emp.employment_status) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="empty-state">
+          <div class="empty-icon"></div>
+          <p>No employees yet.</p>
+          <% if policy(Employee).create? %>
+            <%= link_to "Add First Employee", new_employee_path, class: "btn btn-primary btn-sm" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Leave Summary</h2>
+      <span class="card-subtitle"><%= Date.current.strftime("%B %Y") %></span>
+    </div>
+    <div class="card-body">
+      <% if @monthly_leave_summary.any? %>
+        <% total_leaves = @monthly_leave_summary.values.sum.to_f %>
+        <% leave_colors = { "pending" => "#f59e0b", "approved" => "#10b981", "rejected" => "#ef4444", "cancelled" => "#9ca3af" } %>
+        <div class="leave-summary-list">
+          <% @monthly_leave_summary.each do |status, count| %>
+            <div class="leave-summary-row">
+              <div class="leave-summary-left">
+                <span class="leave-dot" style="background: <%= leave_colors[status] || "#6b7280" %>"></span>
+                <span class="leave-summary-label"><%= status.present? ? status.humanize : "Unknown" %></span>
+              </div>
+              <div class="leave-summary-right">
+                <span class="leave-summary-count"><%= count %></span>
+                <div class="leave-bar-wrap">
+                  <div class="leave-bar"
+                       style="width: <%= total_leaves > 0 ? (count / total_leaves * 100).round : 0 %>%;
+                              background: <%= leave_colors[status] || "#6b7280" %>">
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <div class="leave-summary-total">
+          <span>Total this month</span>
+          <strong><%= @monthly_leave_summary.values.sum %></strong>
+        </div>
+      <% else %>
+        <div class="empty-state"><p>No leave requests this month.</p></div>
+      <% end %>
+    </div>
+    <div class="card-footer">
+      <%= link_to "View All Leave Requests", leave_requests_path, class: "card-footer-link" %>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Pending Approvals</h2>
+      <% if @stats[:pending_leaves] > 0 %>
+        <span class="badge badge--amber"><%= @stats[:pending_leaves] %> pending</span>
+      <% end %>
+    </div>
+    <div class="card-body p-0">
+      <% if @pending_leaves.any? %>
+        <div class="leave-request-list">
+          <% @pending_leaves.each do |leave| %>
+            <div class="leave-request-item">
+              <div class="leave-request-avatar">
+                <%= leave.employee&.first_name&.first&.upcase %><%= leave.employee&.last_name&.first&.upcase %>
+              </div>
+              <div class="leave-request-info">
+                <div class="leave-request-name"><%= leave.employee&.full_name %></div>
+                <div class="leave-request-meta">
+                  <span class="tag tag--sm"><%= leave.leave_type&.humanize %></span>
+                  <span class="text-muted">
+                    <%= leave.start_date&.strftime("%b %-d") %> &ndash; <%= leave.end_date&.strftime("%b %-d") %>
+                    &nbsp;<%= pluralize((leave.end_date && leave.start_date ? (leave.end_date - leave.start_date).to_i + 1 : 1), "day") %>
+                  </span>
+                </div>
+              </div>
+              <div class="leave-request-actions">
+                <% if policy(leave).review? %>
+                  <%= button_to "&#10003;".html_safe,
+                        approve_leave_request_path(leave),
+                        method: :patch,
+                        class: "btn btn-xs btn-success",
+                        data: { confirm: "Approve leave for #{leave.employee&.full_name}?" } %>
+                <% end %>
+                <%= link_to "Review", leave_request_path(leave), class: "btn btn-xs btn-outline" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="empty-state">
+          <div class="empty-icon"></div>
+          <p>No pending requests.</p>
+        </div>
+      <% end %>
+    </div>
+    <div class="card-footer">
+      <%= link_to "All Leave Requests", leave_requests_path, class: "card-footer-link" %>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Today's Attendance</h2>
+      <span class="card-subtitle"><%= Date.current.strftime("%b %-d") %></span>
+    </div>
+    <div class="card-body p-0">
+      <% if @today_attendance.any? %>
+        <table class="data-table data-table--compact">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>In</th>
+              <th>Out</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @today_attendance.each do |rec| %>
+              <tr>
+                <td>
+                  <div class="employee-cell employee-cell--sm">
+                    <div class="avatar-xs">
+                      <%= rec.employee&.first_name&.first&.upcase %><%= rec.employee&.last_name&.first&.upcase %>
+                    </div>
+                    <span><%= rec.employee&.full_name %></span>
+                  </div>
+                </td>
+                <td><%= rec.check_in&.strftime("%H:%M") || "—" %></td>
+                <td>
+                  <% if rec.check_out.present? %>
+                    <%= rec.check_out.strftime("%H:%M") %>
+                  <% elsif rec.check_in.present? %>
+                    <span class="text-muted text-sm">Active</span>
+                  <% else %>
+                    —
+                  <% end %>
+                </td>
+                <td><%= status_badge(rec.status) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="empty-state">
+          <div class="empty-icon"></div>
+          <p>No attendance records today.</p>
+        </div>
+      <% end %>
+    </div>
+    <div class="card-footer">
+      <%= link_to "Full Attendance Log", attendance_records_path, class: "card-footer-link" %>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Headcount by Department</h2>
+      <%= link_to "Departments", departments_path, class: "card-link" %>
+    </div>
+    <div class="card-body">
+      <% if @department_headcount.any? %>
+        <% max_count = @department_headcount.values.max.to_f %>
+        <div class="headcount-list">
+          <% @department_headcount.sort_by { |_, v| -v }.each do |dept_name, count| %>
+            <div class="headcount-row">
+              <div class="headcount-label" title="<%= dept_name %>">
+                <%= truncate(dept_name, length: 20) %>
+              </div>
+              <div class="headcount-bar-wrap">
+                <div class="headcount-bar" style="width: <%= (count / max_count * 100).round %>%"></div>
+              </div>
+              <span class="headcount-count"><%= count %></span>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="empty-state"><p>No department data available.</p></div>
+      <% end %>
+    </div>
+  </section>
+
+</div>

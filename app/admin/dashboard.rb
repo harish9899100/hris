@@ -10,6 +10,18 @@ ActiveAdmin.register_page "Dashboard" do
       end
     end
 
+    panel "Organizations" do
+      table_for Organization.limit(5) do
+        column :id
+        column :name
+        column :created_at
+      end
+
+      div do
+        link_to "View All Organizations", admin_organizations_path
+      end
+    end
+
     panel "Attendance Stats" do
       date = params[:date].present? ? Date.parse(params[:date]) : Date.today
 

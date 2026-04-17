@@ -1,14 +1,19 @@
 Rails.application.routes.draw do
-  devise_for :employees
+  get "homes/index"
+ 
   #get "profiles/show"
   resources :dashboards
+  resources :departments
+  resources :positions
   resources :payslips, only: [:index, :show]
   resources :leave_requests
   resources :attendance_records
-  resources :employees
+
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
-  devise_for :users
+  devise_for :users 
+  devise_for :employees
+  resources :employees
   get "dashboards/index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -21,5 +26,6 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  root "dashboards#index"
+  #root "dashboards#index"
+  root "homes#index"
 end

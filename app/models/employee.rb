@@ -1,6 +1,4 @@
 class Employee < ApplicationRecord
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
   include TenantScoped
@@ -11,7 +9,6 @@ class Employee < ApplicationRecord
   has_many :attendance_records, dependent: :destroy
   has_many :leave_requests, dependent: :destroy
   has_many :payslips, dependent: :destroy
-  #has_many :salary_components, dependent: :destroy
   has_one :user, dependent: :nullify
   has_many_attached :documents
   enum :employment_status, { active: 0, on_leave: 1, terminated: 2}
@@ -32,5 +29,13 @@ class Employee < ApplicationRecord
     [
       "attendance_records", "department", "documents_attachments", "documents_blobs", "leave_requests", "manager", "payslips", "position", "user"
     ]
+  end
+  def self.search(query)
+    return all if query.blank?
+
+    where(
+      "first_name ILIKE :q OR last_name ILIKE :q OR email ILIKE :q",
+      q: "%#{query}%"
+    )
   end
 end

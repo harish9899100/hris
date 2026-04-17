@@ -1,19 +1,4 @@
 ActiveAdmin.register Department do
-
-  # See permitted parameters documentation:
-  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-  #
-  # Uncomment all parameters which should be permitted for assignment
-  #
-  # permit_params :name, :description, :manager_id
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:name, :description, :manager_id]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
   permit_params :name, :description, :manager_id, :created_at
 
   menu priority: 3, label: "Departments"
@@ -42,24 +27,20 @@ ActiveAdmin.register Department do
     f.actions
   end
   controller do
-    include Pundit::Authorization
     def scoped_collection
-      policy_scope(Department)
-      super.includes(:manager)
+      Department.unscoped.includes(:manager)   
     end
+
     def create
-      authorize resource_class
-      super
-    end
+      build_resource
+      resource.organization = Organization.first 
 
-    def update
-      authorize resource
-      super
-    end
-
-    def destroy
-      authorize resource
-      super
+      if resource.save
+        redirect_to resource_path(resource), notice: "Department created successfully"
+      else
+        flash[:error] = resource.errors.full_messages.join(", ")
+        render :new
+      end
     end
   end
 end

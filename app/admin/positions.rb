@@ -56,39 +56,21 @@ ActiveAdmin.register Position do
     f.actions
   end
 
-  controller do
-    include Pundit::Authorization
+    controller do
     def scoped_collection
-      policy_scope(Position)
-      super.includes(:department)
+      Position.unscoped.includes(:department) 
     end
+
     def create
-      authorize resource_class
-      super
-    end
-    def update
-      authorize resource_class
-      super
-    end
-    def destroy
-      authorize resource
-      super
+      build_resource
+      resource.organization = Organization.first 
+
+      if resource.save
+        redirect_to resource_path(resource), notice: "Position created successfully"
+      else
+        flash[:error] = resource.errors.full_messages.join(", ")
+        render :new
+      end
     end
   end
 end
-
-  # See permitted parameters documentation:
-  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-  #
-  # Uncomment all parameters which should be permitted for assignment
-  #
-  # permit_params :base_salary, :department_id, :employment_type, :organization_id, :title
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:base_salary, :department_id, :employment_type, :organization_id, :title]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
-  
