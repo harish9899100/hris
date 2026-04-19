@@ -2,6 +2,15 @@ Rails.application.routes.draw do
   get "homes/index"
  
   #get "profiles/show"
+  resources :attendance_records do
+    collection do
+      post :check_in
+    end
+
+    member do
+      post :check_out
+    end
+  end
   resources :dashboards
   resources :departments
   resources :positions

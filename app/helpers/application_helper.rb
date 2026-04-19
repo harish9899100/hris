@@ -11,4 +11,18 @@ module ApplicationHelper
       "<span class='badge'>#{status}</span>".html_safe
     end
   end
+  def time_of_day_greeting
+    hour = Time.current.hour
+
+    case hour
+    when 5...12
+      "Morning"
+    when 12...17
+      "Afternoon"
+    when 17...21
+      "Evening"
+    else
+      "Night"
+    end
+  end
 end

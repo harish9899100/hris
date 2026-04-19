@@ -1,41 +1,72 @@
-<h1>Payslip Details</h1>
+<div class="max-w-3xl mx-auto px-6 py-12">
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <h1 class="text-4xl font-bold text-gray-900 dark:text-white">
+        Payslip
+      </h1>
+      <p class="text-2xl text-gray-600 dark:text-gray-400 mt-1">
+        <%= Date::MONTHNAMES[@payslip.month] %> <%= @payslip.year %>
+      </p>
+    </div>
 
-<hr>
+    <div class="text-right">
+      <div class="text-5xl font-bold text-emerald-600 tracking-tight">
+        <%= number_to_currency(@payslip.net) %>
+      </div>
+      <p class="text-sm text-gray-500 dark:text-gray-400">NET PAY</p>
+    </div>
+  </div>
 
-<p>
-  <strong>Employee:</strong>
-  <%= @payslip.employee.full_name %>
-</p>
+  <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+      
+      <!-- Earnings / Gross -->
+      <div>
+        <h3 class="text-lg font-semibold text-emerald-600 mb-4">Earnings</h3>
+        <div class="bg-emerald-50 dark:bg-emerald-950/50 rounded-2xl p-6">
+          <div class="flex justify-between items-baseline">
+            <span class="text-gray-700 dark:text-gray-300 text-lg">Gross Salary</span>
+            <span class="text-3xl font-semibold text-emerald-700 dark:text-emerald-400">
+              <%= number_to_currency(@payslip.gross) %>
+            </span>
+          </div>
+        </div>
+      </div>
 
-<p>
-  <strong>Month:</strong>
-  <%= Date::MONTHNAMES[@payslip.month] %>
-</p>
+      <!-- Deductions -->
+      <div>
+        <h3 class="text-lg font-semibold text-red-600 mb-4">Deductions</h3>
+        <div class="bg-red-50 dark:bg-red-950/50 rounded-2xl p-6">
+          <div class="flex justify-between items-baseline">
+            <span class="text-gray-700 dark:text-gray-300 text-lg">Total Deductions</span>
+            <span class="text-3xl font-semibold text-red-700 dark:text-red-400">
+              <%= number_to_currency(@payslip.deductions) %>
+            </span>
+          </div>
+        </div>
+      </div>
 
-<p>
-  <strong>Year:</strong>
-  <%= @payslip.year %>
-</p>
+    </div>
 
-<hr>
+    <!-- Net Pay Highlight -->
+    <div class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-700">
+      <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900 rounded-2xl p-8">
+        <span class="text-2xl font-semibold text-gray-800 dark:text-gray-200">Net Payable Amount</span>
+        <span class="text-5xl font-bold text-emerald-600">
+          <%= number_to_currency(@payslip.net) %>
+        </span>
+      </div>
+    </div>
+  </div>
 
-<h3>Salary Breakdown</h3>
+  <!-- Action Buttons -->
+  <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+    <%= link_to "← Back to Payslips", 
+          payslips_path, 
+          class: "px-8 py-4 border border-gray-300 dark:border-gray-600 rounded-2xl font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" %>
 
-<p>
-  <strong>Gross Salary:</strong>
-  ₹ <%= @payslip.gross %>
-</p>
-
-<p>
-  <strong>Deductions:</strong>
-  ₹ <%= @payslip.deductions %>
-</p>
-
-<p>
-  <strong>Net Salary:</strong>
-  ₹ <%= @payslip.net %>
-</p>
-
-<hr>
-
-<%= link_to "Back to Payslips", payslips_path %>
+    <%= link_to "Download PDF", 
+          payslip_path(@payslip, format: :pdf), 
+          class: "px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl transition-all" %>
+  </div>
+</div>

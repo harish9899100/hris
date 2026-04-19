@@ -18,44 +18,20 @@ class ApplicationPolicy
     false
   end
 
-  def new?
-    create?
-  end
-
   def update?
     false
-  end
-
-  def edit?
-    update?
   end
 
   def destroy?
     false
   end
 
+  def employee?
+    user&.employee_id.present? && user.employee.present?
+  end
+
   def super_admin?
-    user.present? && user.super_admin?
-  end
-
-  def hr_manager?
-    user.present? && user.hr_manager?
-  end
-
-  def dept_manager?
-    user.present? && user.dept_manager?
-  end
-
-  def employee_role?
-    user.present? && user.employee.present?
-  end
-
-  def hr_or_above?
-    super_admin? || hr_manager?
-  end
-
-  def manager_or_above?
-    super_admin? || hr_manager? || dept_manager?
+    user.respond_to?(:role) && user.role == "super_admin"
   end
 
   class Scope
@@ -67,37 +43,15 @@ class ApplicationPolicy
     end
 
     def resolve
-      if super_admin? || hr_manager?
-        scope.all
-      elsif dept_manager?
-        scope.all
-      else
-        scope.none
-      end
+      raise NotImplementedError, "You must define #resolve in #{self.class}"
+    end
+
+    def employee?
+      user&.employee_id.present? && user.employee.present?
     end
 
     def super_admin?
-      user.present? && user.super_admin?
-    end
-
-    def hr_manager?
-      user.present? && user.hr_manager?
-    end
-
-    def dept_manager?
-      user.present? && user.dept_manager?
-    end
-
-    def employee_role?
-      user.present? && user.employee.present?
-    end
-
-    def hr_or_above?
-      super_admin? || hr_manager?
-    end
-
-    def manager_or_above?
-      super_admin? || hr_manager? || dept_manager?
+      user.respond_to?(:role) && user.role == "super_admin"
     end
   end
 end

@@ -1,4 +1,211 @@
-<div>
-  <h1 class="font-bold text-4xl">Homes#index</h1>
-  <p>Find me in app/views/homes/index.html.erb</p>
+<div class="bg-zinc-950 text-white min-h-screen font-sans">
+
+  <!-- Navbar -->
+  <header class="flex justify-between items-center px-6 md:px-12 py-6 border-b border-zinc-800">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center font-bold text-xl">H</div>
+      <h1 class="text-2xl font-semibold tracking-tight">Human-Resource-Information-System</h1>
+    </div>
+
+    <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+      <%= link_to "Features", "#features", class: "hover:text-indigo-400 transition-colors" %>
+      <%= link_to "How it Works", "#how-it-works", class: "hover:text-indigo-400 transition-colors" %>
+      <%= link_to "Testimonials", "#testimonials", class: "hover:text-indigo-400 transition-colors" %>
+    </nav>
+
+    <div class="flex items-center gap-4">
+      <%= link_to "Login", new_employee_session_path, class: "text-sm font-medium hover:text-indigo-400 transition-colors" %>
+      <%= link_to "Admin", "/admin", class: "bg-white text-zinc-900 px-5 py-2.5 rounded-2xl font-semibold hover:bg-zinc-100 transition-all active:scale-95" %>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-24 pb-32 overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(at_top_right,#4f46e510_0%,transparent_50%)]"></div>
+    
+    <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+      <div class="space-y-8">
+        <div class="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-full px-4 py-1 text-sm">
+          <span class="text-emerald-400">●</span>
+          <span>Now AI-Powered</span>
+        </div>
+
+        <h2 class="text-6xl md:text-7xl font-bold tracking-tighter leading-none">
+          Smart HR.<br>
+          <span class="bg-gradient-to-r from-indigo-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">Powered by AI</span>
+        </h2>
+
+        <p class="text-xl text-zinc-400 max-w-lg">
+          Manage employees, attendance, payroll, and leave with intelligent insights. 
+          Reduce manual work and make data-driven decisions effortlessly.
+        </p>
+
+        <div class="flex flex-wrap gap-4">
+          <%= link_to "Get Started Free", 
+            new_user_session_path, 
+            class: "bg-white text-zinc-950 px-8 py-4 rounded-2xl font-semibold text-lg hover:bg-zinc-100 transition-all active:scale-95 shadow-xl shadow-indigo-500/20" %>
+
+          <%= link_to "Watch Demo", 
+            "#", 
+            class: "border border-zinc-700 hover:border-zinc-500 px-8 py-4 rounded-2xl font-medium text-lg transition-colors" %>
+        </div>
+
+        <div class="flex items-center gap-8 text-sm text-zinc-500">
+          <div>✓ No credit card required</div>
+          <div>✓ 14-day full access</div>
+        </div>
+      </div>
+
+      <!-- Hero Visual -->
+      <div class="relative hidden md:block">
+        <div class="bg-zinc-900 border border-zinc-700 rounded-3xl overflow-hidden shadow-2xl shadow-black/80">
+          <div class="bg-zinc-800 h-11 flex items-center px-4 gap-2">
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+          </div>
+          <div class="p-8 bg-gradient-to-br from-zinc-950 to-zinc-900 aspect-video flex items-center justify-center">
+            <div class="text-center">
+              <div class="text-4xl mb-4">📊</div>
+              <p class="text-zinc-400">Intelligent HR Dashboard</p>
+              <p class="text-xs text-emerald-400 mt-2">AI Insights Active</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Floating badge -->
+        <div class="absolute -top-6 -right-6 bg-zinc-900 border border-zinc-700 rounded-2xl px-6 py-4 shadow-xl">
+          <div class="flex items-center gap-3">
+            <div class="text-3xl">🚀</div>
+            <div>
+              <div class="font-semibold">98% faster payroll</div>
+              <div class="text-xs text-zinc-500">with AI automation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="py-24 bg-zinc-900">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h3 class="text-4xl font-bold tracking-tight">Everything your HR team needs</h3>
+        <p class="text-zinc-400 mt-3 text-lg">Powerful features. Beautifully simple.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="group bg-zinc-950 border border-zinc-800 hover:border-indigo-500/50 rounded-3xl p-8 transition-all duration-300">
+          <div class="w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">👥</div>
+          <h4 class="text-2xl font-semibold mb-3">Employee Management</h4>
+          <p class="text-zinc-400">Centralized profiles, departments, roles, and documents with smart search.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="group bg-zinc-950 border border-zinc-800 hover:border-indigo-500/50 rounded-3xl p-8 transition-all duration-300">
+          <div class="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">📅</div>
+          <h4 class="text-2xl font-semibold mb-3">Attendance Tracking</h4>
+          <p class="text-zinc-400">Real-time attendance, geofencing, and automated reports with AI anomaly detection.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="group bg-zinc-950 border border-zinc-800 hover:border-indigo-500/50 rounded-3xl p-8 transition-all duration-300">
+          <div class="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">💰</div>
+          <h4 class="text-2xl font-semibold mb-3">Payroll System</h4>
+          <p class="text-zinc-400">Automated salary calculations, tax compliance, and instant payslip generation.</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="group bg-zinc-950 border border-zinc-800 hover:border-indigo-500/50 rounded-3xl p-8 transition-all duration-300">
+          <div class="w-12 h-12 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">🌴</div>
+          <h4 class="text-2xl font-semibold mb-3">Leave Management</h4>
+          <p class="text-zinc-400">Self-service leave requests, balance tracking, and smart approval workflows.</p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="group bg-zinc-950 border border-zinc-800 hover:border-indigo-500/50 rounded-3xl p-8 transition-all duration-300">
+          <div class="w-12 h-12 bg-purple-500/10 text-purple-400 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">🔐</div>
+          <h4 class="text-2xl font-semibold mb-3">Role-Based Access</h4>
+          <p class="text-zinc-400">Secure permissions with advanced audit logs and compliance tools.</p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="group bg-zinc-950 border border-zinc-800 hover:border-indigo-500/50 rounded-3xl p-8 transition-all duration-300">
+          <div class="w-12 h-12 bg-cyan-500/10 text-cyan-400 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">🔗</div>
+          <h4 class="text-2xl font-semibold mb-3">AI Insights &amp; Integrations</h4>
+          <p class="text-zinc-400">Predictive analytics, chatbot assistance, and seamless API/webhook connections.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how-it-works" class="py-24 bg-black">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <h3 class="text-4xl font-bold mb-4">Simple. Powerful. Fast.</h3>
+      <p class="text-zinc-400 mb-16 max-w-md mx-auto">Get up and running in minutes</p>
+
+      <div class="grid md:grid-cols-3 gap-10">
+        <div class="space-y-6">
+          <div class="w-16 h-16 mx-auto bg-zinc-900 border border-zinc-700 rounded-2xl flex items-center justify-center text-4xl">1️⃣</div>
+          <h4 class="text-2xl font-semibold">Add Employees</h4>
+          <p class="text-zinc-400">Import via CSV or create profiles instantly with AI suggestions.</p>
+        </div>
+        <div class="space-y-6">
+          <div class="w-16 h-16 mx-auto bg-zinc-900 border border-zinc-700 rounded-2xl flex items-center justify-center text-4xl">2️⃣</div>
+          <h4 class="text-2xl font-semibold">Track Daily</h4>
+          <p class="text-zinc-400">Monitor attendance, leaves, and performance with live dashboards.</p>
+        </div>
+        <div class="space-y-6">
+          <div class="w-16 h-16 mx-auto bg-zinc-900 border border-zinc-700 rounded-2xl flex items-center justify-center text-4xl">3️⃣</div>
+          <h4 class="text-2xl font-semibold">Run Payroll</h4>
+          <p class="text-zinc-400">Generate accurate payslips and compliance reports automatically.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials (optional but adds trust) -->
+  <section id="testimonials" class="py-24 bg-zinc-900">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-12">
+        <h3 class="text-3xl font-bold">Loved by HR teams</h3>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-zinc-950 p-8 rounded-3xl border border-zinc-800">
+          <p class="italic text-zinc-300">"HRIS cut our payroll processing time by 70%. The AI insights are a game changer."</p>
+          <div class="mt-8 flex items-center gap-4">
+            <div class="w-10 h-10 bg-zinc-700 rounded-full"></div>
+            <div>
+              <div class="font-medium">Priya Sharma</div>
+              <div class="text-xs text-zinc-500">HR Head, TechNova</div>
+            </div>
+          </div>
+        </div>
+        <!-- Add 2 more similar cards if you want -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="py-28 bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 text-center">
+    <div class="max-w-2xl mx-auto px-6">
+      <h3 class="text-5xl font-bold tracking-tight mb-6">Start managing your workforce smarter today</h3>
+      <p class="text-xl text-white/90 mb-10">Join thousands of companies using AI to transform HR.</p>
+      
+      <%= link_to "Get Started Now", 
+        new_user_session_path, 
+        class: "inline-block bg-white text-indigo-700 px-10 py-5 rounded-3xl font-semibold text-xl hover:bg-zinc-100 transition-all active:scale-95 shadow-2xl" %>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-black py-12 border-t border-zinc-900">
+    <div class="max-w-7xl mx-auto px-6 text-center text-zinc-500 text-sm">
+      © <%= Time.current.year %> HRIS. All rights reserved. • Built for the future of work.
+    </div>
+  </footer>
+
 </div>

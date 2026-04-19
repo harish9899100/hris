@@ -1,33 +1,55 @@
-<h1>Apply for Leave</h1>
-
-<%= form_with model: @leave_request, local: true do |f| %>
-
-  <div>
-    <%= f.label :start_date %><br>
-    <%= f.date_field :start_date %>
+<div class="max-w-2xl mx-auto px-6 py-10">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+      Apply for Leave
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2">
+      Fill the details below to submit your leave request
+    </p>
   </div>
 
-  <div>
-    <%= f.label :end_date %><br>
-    <%= f.date_field :end_date %>
+  <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-8">
+    <%= form_with model: @leave_request, local: true, class: "space-y-8" do |f| %>
+
+      <div>
+        <%= f.label :start_date, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" %>
+        <%= f.date_field :start_date,
+              class: "w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" %>
+      </div>
+
+      <div>
+        <%= f.label :end_date, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" %>
+        <%= f.date_field :end_date,
+              class: "w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" %>
+      </div>
+
+      <div>
+        <%= f.label :leave_type, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" %>
+        <%= f.select :leave_type,
+              ["Casual", "Sick", "Annual", "Unpaid", "Other"],
+              { prompt: "Select Leave Type" },
+              class: "w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" %>
+      </div>
+
+      <div>
+        <%= f.label :reason, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" %><br>
+        <%= f.text_area :reason,
+              rows: 5,
+              placeholder: "Please provide a detailed reason for your leave...",
+              class: "w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-y" %>
+      </div>
+
+      <div class="pt-6">
+        <%= f.submit "Submit Leave Request",
+              class: "w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-2xl text-lg transition-all active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300" %>
+      </div>
+
+    <% end %>
   </div>
 
-  <div>
-    <%= f.label :leave_type %><br>
-    <%= f.select :leave_type, ["Casual", "Sick", "Annual", "Unpaid", "Other"] %>
+  <div class="mt-8 text-center">
+    <%= link_to "← Back to My Leaves", 
+          leave_requests_path, 
+          class: "inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors" %>
   </div>
-
-  <div>
-    <%= f.label :reason %><br>
-    <%= f.text_area :reason %>
-  </div>
-
-  <div>
-    <%= f.submit "Apply Leave" %>
-  </div>
-
-<% end %>
-
-<br>
-
-<%= link_to "Back", leave_requests_path %>
+</div>

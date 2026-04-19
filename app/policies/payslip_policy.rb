@@ -1,4 +1,4 @@
-class LeaveRequestPolicy < ApplicationPolicy
+class PayslipPolicy < ApplicationPolicy
   def index?
     employee? || super_admin?
   end
@@ -7,23 +7,15 @@ class LeaveRequestPolicy < ApplicationPolicy
     record_belongs_to_current_employee? || super_admin?
   end
 
-  def new?
-    employee?
-  end
-
   def create?
-    employee?
+    super_admin?
   end
 
   def update?
-    record_belongs_to_current_employee? || super_admin?
+    super_admin?
   end
 
   def destroy?
-    record_belongs_to_current_employee? || super_admin?
-  end
-
-  def review?
     super_admin?
   end
 
@@ -45,11 +37,11 @@ class LeaveRequestPolicy < ApplicationPolicy
     user.employee_id.present? && user.employee.present?
   end
 
-  def record_belongs_to_current_employee?
-    record.employee_id == user.employee_id
-  end
-
   def super_admin?
     user.respond_to?(:role) && user.role == "super_admin"
+  end
+
+  def record_belongs_to_current_employee?
+    record.employee_id == user.employee_id
   end
 end

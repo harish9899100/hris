@@ -24,13 +24,14 @@
 
   <div class="page-actions">
     <% if policy(@employee).update? %>
+      <%= if @employee.activa? %>
       <%= link_to "Edit", edit_employee_path(@employee), class: "btn btn-outline" %>
-
-      <% if @employee.active? %>
-        <%= button_to "Terminate", terminate_employee_path(@employee),
-              method: :patch,
-              class: "btn btn-danger btn-sm",
-              data: { confirm: "Terminate #{@employee.full_name}? This action can be reversed." } %>
+      <%= button_to "Terminate Employee", 
+      employee_path(@employee), 
+      method: :patch,
+      params: { employee: { employment_status: "terminated" } },   # or whatever your status field is
+      class: "px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl text-sm transition-all",
+      data: { confirm: "Terminate #{@employee.full_name || @employee.first_name}? This action can be reversed." } %>
       <% elsif @employee.terminated? %>
         <%= button_to "Re-activate", activate_employee_path(@employee),
               method: :patch,

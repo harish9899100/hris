@@ -17,10 +17,11 @@ class PayslipsController < ApplicationController
   end
 
   def show
+    @payslip = Payslip.find(params[:id])
     authorize @payslip
-    @salary_components = @payslip.salary_components.order(:component_type, :name)
-    @earnings          = @salary_components.where(component_type: :earning)
-    @deductions        = @salary_components.where(component_type: :deduction)
+    #@salary_components = @payslip.salary_components.order(:component_type, :name)
+    #@earnings          = @salary_components.where(component_type: :earning)
+    #@deductions        = @salary_components.where(component_type: :deduction)
   end
 
   def new

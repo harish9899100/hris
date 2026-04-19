@@ -9,8 +9,13 @@ class ApplicationController < ActionController::Base
 
   private
   def pundit_user
-    current_admin_user || current_employee
+    return current_admin_user if current_admin_user.present?
+    return current_user if current_user.present?
+    return current_employee.user if current_employee.present?
+
+    nil
   end
+
   def user_not_authorized
     flash[:alert] = "You are not authorized to perform this action."
     redirect_back(fallback_location: root_path)
@@ -28,7 +33,7 @@ class ApplicationController < ActionController::Base
     if current_admin_user.present?
       Current.organization = nil 
     else
-      Current.organization = current_user&.organization
+      Current.organization = current_user&.organization || current_employee&.organization
     end
   end
 
@@ -37,7 +42,9 @@ class ApplicationController < ActionController::Base
     return if active_admin_controller?
     return if current_admin_user.present?  
 
-    if action_name == "index"
+    if controller_name == "employees" && action_name == "index" && @dashboard
+      verify_authorized
+    elsif action_name == "index"
       verify_policy_scoped
     else
       #verify_authorized
