@@ -40,7 +40,7 @@
         </div>
         <div class="flex items-center gap-6 mt-3">
           <div>
-            <p class="text-white/60 text-xs mb-0.5">Check In</p>
+            <p class="text-black text-xs mb-0.5">Check In</p>
             <p class="text-black text-black font-bold mono"><%= @attendance.check_in.strftime("%I:%M") %><span class="text-base font-normal text-black/70 ml-1"><%= @attendance.check_in.strftime("%p") %></span></p>
           </div>
           <% if @attendance.checked_out? %>
