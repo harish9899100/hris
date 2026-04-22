@@ -2,6 +2,8 @@ class LeaveRequest < ApplicationRecord
   include TenantScoped
   include Ransackable
 
+  STATUSES = %w[pending approved rejected cancelled].freeze
+
   belongs_to :employee
   belongs_to :organization
   belongs_to :approved_by, class_name: "User", optional: true
