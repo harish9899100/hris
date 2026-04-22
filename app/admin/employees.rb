@@ -1,6 +1,6 @@
 ActiveAdmin.register Employee do
 
-  permit_params :first_name, :last_name, :email, :employee_id, :department_id, :position_id, :manager_id, :date_of_joining, :employment_status, :salary, :phone, :status, :password, :password_confirmation
+  permit_params :first_name, :last_name, :email, :employee_id, :department_id, :position_id, :date_of_joining, :employment_status, :salary, :phone, :status
 
   menu priority: 2, label: "Employees"
 
@@ -18,7 +18,6 @@ ActiveAdmin.register Employee do
     column :email
     column :department
     column :position
-    column :manager
     column :date_of_joining
     column :employment_status
     column :salary
@@ -33,7 +32,6 @@ ActiveAdmin.register Employee do
   filter :email
   filter :department, as: :select, collection: -> { Department.all.map { |d| [d.name, d.id] } }
   filter :position, as: :select, collection: -> { Position.all.map { |p| [p.title, p.id] } }
-  filter :manager
   filter :date_of_joining
   filter :employment_status, as: :select, collection: Employee.employment_statuses.keys.map { |s| [s.humanize, s] }
   filter :salary
@@ -45,11 +43,8 @@ ActiveAdmin.register Employee do
       f.input :first_name
       f.input :last_name
       f.input :email
-      f.input :password
-      f.input :password_confirmation
       f.input :department
       f.input :position
-      f.input :manager, collection: Employee.all.map { |e| [e.full_name, e.id] }
       f.input :date_of_joining, as: :datepicker
       f.input :employment_status, as: :select, collection: Employee.employment_statuses.keys
       f.input :salary
@@ -67,7 +62,6 @@ ActiveAdmin.register Employee do
       row :email
       row :department
       row :position
-      row :manager
       row :date_of_joining
       row :employment_status
       row :salary
