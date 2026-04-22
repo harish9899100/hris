@@ -1,0 +1,88 @@
+<% content_for :title, "Leave Request" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="flex items-center gap-3 mb-6">
+    <%= link_to leave_requests_path,
+          class: "w-8 h-8 flex items-center justify-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-500 transition-colors flex-shrink-0" do %>
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+    <% end %>
+    <div>
+      <h1 class="text-xl font-bold text-slate-800">Leave Request Details</h1>
+      <p class="text-slate-400 text-sm">Applied on <%= @leave_request.created_at.strftime("%B %-d, %Y") %></p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+    <%
+      banner_class = case @leave_request.status
+      when "pending"   then "bg-amber-50 border-amber-200"
+      when "approved"  then "bg-emerald-50 border-emerald-200"
+      when "rejected"  then "bg-red-50 border-red-200"
+      when "cancelled" then "bg-slate-50 border-slate-200"
+      end
+    %>
+    <div class="px-7 py-5 border-b <%= banner_class %> flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <h2 class="text-lg font-extrabold text-slate-800 capitalize"><%= @leave_request.leave_type %> Leave</h2>
+        <%= render "shared/leave_badge", status: @leave_request.status %>
+      </div>
+      <% if @leave_request.can_cancel? %>
+        <%= button_to cancel_leave_request_path(@leave_request), method: :patch,
+              class: "inline-flex items-center gap-1.5 text-sm font-semibold text-red-500 hover:text-red-700 border border-red-200 hover:border-red-300 bg-white px-4 py-2 rounded-xl transition-colors",
+              data: { turbo_confirm: "Are you sure you want to cancel this leave request?" } do %>
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          Cancel Request
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="p-7 grid grid-cols-2 gap-x-8 gap-y-6">
+      <div>
+        <p class="text-[11px] text-slate-400 uppercase tracking-widest font-bold mb-1.5">Leave Type</p>
+        <p class="text-sm font-semibold text-slate-800 capitalize"><%= @leave_request.leave_type %></p>
+      </div>
+      <div>
+        <p class="text-[11px] text-slate-400 uppercase tracking-widest font-bold mb-1.5">Duration</p>
+        <p class="text-sm font-semibold text-slate-800">
+          <%= @leave_request.duration_days %> day<%= "s" if @leave_request.duration_days > 1 %>
+        </p>
+      </div>
+      <div>
+        <p class="text-[11px] text-slate-400 uppercase tracking-widest font-bold mb-1.5">Start Date</p>
+        <p class="text-sm font-semibold text-slate-800"><%= @leave_request.start_date.strftime("%A, %B %-d, %Y") %></p>
+      </div>
+      <div>
+        <p class="text-[11px] text-slate-400 uppercase tracking-widest font-bold mb-1.5">End Date</p>
+        <p class="text-sm font-semibold text-slate-800"><%= @leave_request.end_date.strftime("%A, %B %-d, %Y") %></p>
+      </div>
+      <div>
+        <p class="text-[11px] text-slate-400 uppercase tracking-widest font-bold mb-1.5">Applied On</p>
+        <p class="text-sm font-semibold text-slate-800 mono"><%= @leave_request.created_at.strftime("%b %-d, %Y · %I:%M %p") %></p>
+      </div>
+      <div>
+        <p class="text-[11px] text-slate-400 uppercase tracking-widest font-bold mb-1.5">Status</p>
+        <%= render "shared/leave_badge", status: @leave_request.status %>
+      </div>
+
+      <% if @leave_request.approved_by.present? %>
+        <div class="col-span-2">
+          <p class="text-[11px] text-slate-400 uppercase tracking-widest font-bold mb-1.5">
+            <%= @leave_request.approved? ? "Approved" : "Reviewed" %> By
+          </p>
+          <p class="text-sm font-semibold text-slate-800"><%= @leave_request.approved_by.full_name %></p>
+        </div>
+      <% end %>
+
+      <div class="col-span-2">
+        <p class="text-[11px] text-slate-400 uppercase tracking-widest font-bold mb-2">Reason</p>
+        <div class="bg-slate-50 rounded-2xl px-5 py-4 text-sm text-slate-700 leading-relaxed border border-slate-100">
+          <%= @leave_request.reason %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
