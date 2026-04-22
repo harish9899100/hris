@@ -24,7 +24,7 @@
 
   <div class="page-actions">
     <% if policy(@employee).update? %>
-      <%= if @employee.activa? %>
+      <% if @employee.active? %>
       <%= link_to "Edit", edit_employee_path(@employee), class: "btn btn-outline" %>
       <%= button_to "Terminate Employee", 
       employee_path(@employee), 

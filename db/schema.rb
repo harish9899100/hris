@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_13_071006) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_22_112859) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -74,25 +74,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_071006) do
     t.string "email"
     t.string "employee_id"
     t.integer "employment_status"
-    t.string "encrypted_password", default: "", null: false
     t.string "first_name"
     t.string "last_name"
-    t.bigint "manager_id"
     t.bigint "organization_id", null: false
     t.string "phone"
     t.bigint "position_id", null: false
-    t.datetime "remember_created_at"
-    t.datetime "reset_password_sent_at"
-    t.string "reset_password_token"
     t.decimal "salary"
     t.datetime "updated_at", null: false
     t.index ["department_id"], name: "index_employees_on_department_id"
     t.index ["email"], name: "index_employees_on_email", unique: true
     t.index ["employee_id"], name: "index_employees_on_employee_id", unique: true
-    t.index ["manager_id"], name: "index_employees_on_manager_id"
+    t.index ["employment_status"], name: "index_employees_on_employment_status"
     t.index ["organization_id"], name: "index_employees_on_organization_id"
     t.index ["position_id"], name: "index_employees_on_position_id"
-    t.index ["reset_password_token"], name: "index_employees_on_reset_password_token", unique: true
   end
 
   create_table "leave_requests", force: :cascade do |t|
@@ -109,6 +103,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_071006) do
     t.index ["approved_by_id"], name: "index_leave_requests_on_approved_by_id"
     t.index ["employee_id"], name: "index_leave_requests_on_employee_id"
     t.index ["organization_id"], name: "index_leave_requests_on_organization_id"
+    t.index ["status"], name: "index_leave_requests_on_status"
   end
 
   create_table "organization_holidays", force: :cascade do |t|
@@ -174,6 +169,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_071006) do
     t.bigint "employee_id", null: false
     t.string "encrypted_password", null: false
     t.string "name", null: false
+    t.datetime "remember_created_at"
     t.datetime "updated_at", null: false
     t.index ["api_key"], name: "index_users_on_api_key", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
@@ -195,20 +191,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_071006) do
     t.string "url"
   end
 
-  add_foreign_key "attendance_records", "employees"
   add_foreign_key "attendance_records", "organizations"
-  add_foreign_key "departments", "employees", column: "manager_id"
   add_foreign_key "departments", "organizations"
   add_foreign_key "employees", "departments"
-  add_foreign_key "employees", "employees", column: "manager_id"
   add_foreign_key "employees", "organizations"
   add_foreign_key "employees", "positions"
-  add_foreign_key "leave_requests", "employees"
   add_foreign_key "leave_requests", "organizations"
   add_foreign_key "leave_requests", "users", column: "approved_by_id"
   add_foreign_key "organization_holidays", "organizations"
-  add_foreign_key "payslips", "employees"
   add_foreign_key "positions", "departments"
   add_foreign_key "positions", "organizations"
-  add_foreign_key "users", "employees"
 end
