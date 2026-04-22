@@ -1,0 +1,12 @@
+<%
+  cfg = case status
+  when "pending"   then ["bg-amber-100 text-amber-700",   " Pending"]
+  when "approved"  then ["bg-emerald-100 text-emerald-700"," Approved"]
+  when "rejected"  then ["bg-red-100 text-red-600",        " Rejected"]
+  when "cancelled" then ["bg-slate-100 text-slate-500",    "Cancelled"]
+  else                  ["bg-slate-100 text-slate-500",    status&.humanize || "—"]
+  end
+%>
+<span class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold <%= cfg[0] %>">
+  <%= cfg[1] %>
+</span>
