@@ -1,55 +1,18 @@
 class LeaveRequestPolicy < ApplicationPolicy
-  def index?
-    employee? || super_admin?
-  end
-
-  def show?
-    record_belongs_to_current_employee? || super_admin?
-  end
-
-  def new?
-    employee?
-  end
-
-  def create?
-    employee?
-  end
-
-  def update?
-    record_belongs_to_current_employee? || super_admin?
-  end
-
-  def destroy?
-    record_belongs_to_current_employee? || super_admin?
-  end
-
-  def review?
-    super_admin?
-  end
+  def show?    = own_record?
+  def new?     = true
+  def create?  = true
+  def cancel?  = own_record? && record.can_cancel?
 
   class Scope < Scope
     def resolve
-      if super_admin?
-        scope.all
-      elsif employee?
-        scope.where(employee_id: user.employee_id)
-      else
-        scope.none
-      end
+      scope.where(employee_id: user.employee_id)
     end
   end
 
   private
 
-  def employee?
-    user.employee_id.present? && user.employee.present?
-  end
-
-  def record_belongs_to_current_employee?
+  def own_record?
     record.employee_id == user.employee_id
-  end
-
-  def super_admin?
-    user.respond_to?(:role) && user.role == "super_admin"
   end
 end
