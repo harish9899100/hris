@@ -19,9 +19,6 @@ class PayslipsController < ApplicationController
   def show
     @payslip = Payslip.find(params[:id])
     authorize @payslip
-    #@salary_components = @payslip.salary_components.order(:component_type, :name)
-    #@earnings          = @salary_components.where(component_type: :earning)
-    #@deductions        = @salary_components.where(component_type: :deduction)
   end
 
   def new
@@ -75,17 +72,12 @@ class PayslipsController < ApplicationController
 
   def download
     authorize @payslip, :show?
-    respond_to do |format|
-      format.pdf do
-        pdf = PayslipPdf.new(@payslip)
-        send_data pdf.render,
-                  filename: "payslip_#{@payslip.employee.last_name}_#{@payslip.pay_period_end.strftime('%Y%m')}.pdf",
-                  type: "application/pdf",
-                  disposition: "inline"
-      end
-    end
+    pdf = PayslipPdf.new(@payslip)
+    send_data pdf.render,
+              filename: "payslip_#{@employee&.last_name || @payslip.employee.last_name}_#{@payslip.month}_#{@payslip.year}.pdf",
+              type: "application/pdf",
+              disposition: "inline"
   end
-
   private
 
   def set_payslip

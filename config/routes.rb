@@ -22,7 +22,9 @@ Rails.application.routes.draw do
   resources :employees
   resources :departments
   resources :positions
-  resources :payslips, only: [:index, :show]
+  resources :payslips, only: [:index, :show] do
+    member {get :download}
+  end
   resources :profiles, only: [:show]
 
   get "up" => "rails/health#show", as: :rails_health_check

@@ -20,7 +20,6 @@
   <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-10">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
       
-      <!-- Earnings / Gross -->
       <div>
         <h3 class="text-lg font-semibold text-emerald-600 mb-4">Earnings</h3>
         <div class="bg-emerald-50 dark:bg-emerald-950/50 rounded-2xl p-6">
@@ -33,7 +32,6 @@
         </div>
       </div>
 
-      <!-- Deductions -->
       <div>
         <h3 class="text-lg font-semibold text-red-600 mb-4">Deductions</h3>
         <div class="bg-red-50 dark:bg-red-950/50 rounded-2xl p-6">
@@ -48,7 +46,6 @@
 
     </div>
 
-    <!-- Net Pay Highlight -->
     <div class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-700">
       <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900 rounded-2xl p-8">
         <span class="text-2xl font-semibold text-gray-800 dark:text-gray-200">Net Payable Amount</span>
@@ -59,14 +56,13 @@
     </div>
   </div>
 
-  <!-- Action Buttons -->
   <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
     <%= link_to "← Back to Payslips", 
           payslips_path, 
           class: "px-8 py-4 border border-gray-300 dark:border-gray-600 rounded-2xl font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" %>
 
     <%= link_to "Download PDF", 
-          payslip_path(@payslip, format: :pdf), 
-          class: "px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl transition-all" %>
+      download_payslip_path(@payslip), 
+      class: "px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl transition-all" %>
   </div>
 </div>

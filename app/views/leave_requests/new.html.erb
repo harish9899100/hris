@@ -134,7 +134,7 @@
     const e = new Date(endEl.value);
     if (startEl.value && endEl.value && e >= s) {
       const days = Math.round((e - s) / 86400000) + 1;
-      durText.textContent = `📅 This leave spans ${days} day${days > 1 ? 's' : ''} (${startEl.value} → ${endEl.value})`;
+      durText.textContent = ` This leave spans ${days} day${days > 1 ? 's' : ''} (${startEl.value} → ${endEl.value})`;
       preview.classList.remove('hidden');
       preview.classList.add('flex');
       endEl.min = startEl.value;

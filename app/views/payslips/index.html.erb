@@ -45,7 +45,7 @@
             <%= link_to "View Details", payslip_path(payslip),
                   class: "flex-1 text-center py-3 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" %>
 
-            <%= link_to "Download PDF", payslip_path(payslip, format: :pdf),
+            <%= link_to "Download PDF", download_payslip_path(payslip),
                   class: "flex-1 text-center py-3 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-2xl transition-colors" %>
           </div>
         </div>
