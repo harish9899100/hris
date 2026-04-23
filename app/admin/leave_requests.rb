@@ -28,7 +28,7 @@ ActiveAdmin.register LeaveRequest do
       f.input :start_date, as: :datepicker
       f.input :end_date, as: :datepicker
       f.input :status, as: :select, collection: LeaveRequest.statuses.keys
-      f.input :approved_by, collection: AdminUser.all.map { |u| [u.email, u.id] }
+      f.input :approved_by, collection: User.all.map { |u| [u.email, u.id]}#AdminUser.all.map { |u| [u.email, u.id] }
       f.input :reason
     end
     f.actions

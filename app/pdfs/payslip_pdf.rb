@@ -40,7 +40,7 @@ class PayslipPdf
       pdf.move_down 8
 
       table_data = [
-        ["Description", "Amount (Rs.)"],
+        ["Description", "Amount ($)"],
         ["Gross Salary", format_money(@payslip.gross)],
         ["Deductions",   format_money(@payslip.deductions)],
         ["Net Salary",   format_money(@payslip.net)],
@@ -69,6 +69,6 @@ class PayslipPdf
   private
 
   def format_money(amount)
-    "Rs. #{format('%.2f', amount.to_f)}"
+    "$ #{format('%.2f', amount.to_f)}"
   end
 end
