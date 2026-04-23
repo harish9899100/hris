@@ -1,10 +1,7 @@
 class User < ApplicationRecord
   rolify
-
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
-
   belongs_to :employee, optional: true
-
   before_create :generate_api_key
 
   def hr_manager!
@@ -22,7 +19,6 @@ class User < ApplicationRecord
   def finance!
     add_role(:finance)
   end
-
 
   def hr_manager?
     has_role?(:hr_manager)

@@ -59,7 +59,7 @@
           <%= link_to "Attendance", attendance_records_path, class: "nav-link #{controller_name == 'attendance_records' ? 'active' : ''}" %>
           <%= link_to "Leave Requests", leave_requests_path, class: "nav-link #{controller_name == 'leave_requests' ? 'active' : ''}" %>
           <%= link_to "Payslips", payslips_path, class: "nav-link #{controller_name == 'payslips' ? 'active' : ''}" %>
-          <%= link_to "Logout", destroy_user_session_path, method: :delete, class: "nav-link text-red-500" %>
+          <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "nav-link text-red-500 bg-transparent border-0 cursor-pointer" %>
         </nav>
 
       </aside>

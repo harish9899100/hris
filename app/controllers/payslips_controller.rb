@@ -2,7 +2,7 @@ class PayslipsController < ApplicationController
   before_action :set_payslip, only: [:show, :edit, :update, :destroy, :download]
 
   def index
-    @payslips = policy_scope(Payslip).includes(:employee).order(pay_period_end: :desc)
+    @payslips = policy_scope(Payslip).includes(:employee).order(year: :desc, month: :desc)
 
     @payslips = @payslips.where(employee_id: params[:employee_id]) if params[:employee_id].present?
     @payslips = @payslips.where(status: params[:status])           if params[:status].present?

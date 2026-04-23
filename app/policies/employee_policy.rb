@@ -2,37 +2,36 @@ class EmployeePolicy < ApplicationPolicy
   def index?
     return true if admin_user?
 
-    hr_or_above? || dept_manager?
+    hr_manager? || dept_manager?
   end
 
   def show?
     return true if admin_user?
 
-    record_belongs_to_current_user? || hr_or_above? || dept_manager?
+    own_record? || hr_manager? || dept_manager?
   end
 
   def create?
     return true if admin_user?
 
-    hr_or_above?
+    hr_manager?
   end
 
   def update?
     return true if admin_user?
 
-    hr_or_above? || (dept_manager? && record_under_current_manager?)
+    hr_manager? || (dept_manager? && manages_record?)
   end
 
   class Scope < ApplicationPolicy::Scope
     def resolve
       return scope.all if user.is_a?(AdminUser)
 
-      if hr_or_above?
+      if user.hr_manager?
         scope.all
-      elsif dept_manager? && user.respond_to?(:employee) && user.employee.present?
-        scope.where(department_id: user.employee.department_id)
-             .or(scope.where(manager_id: user.employee_id))
-      elsif employee? && user.respond_to?(:employee_id)
+      elsif user.dept_manager?
+        scope.where(manager_id: user.employee_id)
+      elsif user.employee_role?
         scope.where(id: user.employee_id)
       else
         scope.none
@@ -46,37 +45,19 @@ class EmployeePolicy < ApplicationPolicy
     user.is_a?(AdminUser)
   end
 
-  def employee?
-    return false unless user.respond_to?(:employee_id)
-    return false unless user.respond_to?(:employee)
-
-    user.employee_id.present? && user.employee.present?
-  end
-
-  def hr_or_above?
-    return false unless user.respond_to?(:role)
-
-    %w[hr admin super_admin].include?(user.role.to_s.downcase)
+  def hr_manager?
+    user.respond_to?(:hr_manager?) && user.hr_manager?
   end
 
   def dept_manager?
-    return false if admin_user?
-
-    (user.respond_to?(:role) && user.role == "manager") ||
-      (user.respond_to?(:employee) &&
-       user.employee.present? &&
-       user.employee.manager_id.present?)
+    user.respond_to?(:dept_manager?) && user.dept_manager?
   end
 
-  def record_belongs_to_current_user?
-    return false unless user.respond_to?(:employee_id)
-
+  def own_record?
     record.id == user.employee_id
   end
 
-  def record_under_current_manager?
-    return false unless user.respond_to?(:employee_id)
-
+  def manages_record?
     record.manager_id == user.employee_id
   end
 end

@@ -1,33 +1,41 @@
 class PayslipPolicy < ApplicationPolicy
   def index?
-    employee? || super_admin?
+    employee? || hr_manager? || dept_manager?
   end
 
   def show?
-    record_belongs_to_current_employee? || super_admin?
+    own_record? || hr_manager? || dept_manager?
   end
 
   def create?
-    super_admin?
+    hr_manager?
   end
 
   def update?
-    super_admin?
+    hr_manager?
   end
 
   def destroy?
-    super_admin?
+    hr_manager?
   end
 
   class Scope < Scope
     def resolve
-      if super_admin?
+      if user.hr_manager?
+        scope.all
+      elsif user.dept_manager?
         scope.all
       elsif employee?
         scope.where(employee_id: user.employee_id)
       else
         scope.none
       end
+    end
+
+    private
+
+    def employee?
+      user.employee_id.present? && user.employee.present?
     end
   end
 
@@ -37,11 +45,15 @@ class PayslipPolicy < ApplicationPolicy
     user.employee_id.present? && user.employee.present?
   end
 
-  def super_admin?
-    user.respond_to?(:role) && user.role == "super_admin"
+  def hr_manager?
+    user.hr_manager?
   end
 
-  def record_belongs_to_current_employee?
+  def dept_manager?
+    user.dept_manager?
+  end
+
+  def own_record?
     record.employee_id == user.employee_id
   end
 end
