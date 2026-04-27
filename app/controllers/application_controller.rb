@@ -1,35 +1,63 @@
 class ApplicationController < ActionController::Base
   include Pundit::Authorization
+  before_action :authenticate_user!, unless: :admin_namespace?
   before_action :set_current_organization
+  after_action :verify_pundit_authorization, unless: :skip_pundit?
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  helper_method :current_employee
 
-  rescue_from Pundit::NotAuthorizedError, with: :handle_not_authorized
-  rescue_from ActiveAdmin::AccessDenied, with: :handle_not_authorized
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
-
-  # Changes to the importmap will invalidate the etag for HTML responses
-  stale_when_importmap_changes
   private
-  def set_current_organization
-    Current.organization = Organization.first
+
+  def admin_namespace?
+    params[:controller].start_with?("admin/") ||
+      params[:controller].start_with?("active_admin/")
   end
 
-  def set_current_organization
-    Current.organization = Organization.first
+  def current_employee
+    @current_employee ||= current_user&.employee
   end
 
-  def handle_not_authorized(exception)
-    flash[:alert] = exception.message.presence || "You are not authorized to perform this action."
-
-    if current_admin_user.present?
-      redirect_to destroy_admin_user_session_path, allow_other_host: false
-    else
-      redirect_to root_path
+  def ensure_employee!
+    unless current_employee.present?
+      redirect_to root_path, alert: "Employee profile not found."
     end
   end
 
-  # def user_not_authorized
-  #   flash[:alert] = "You are not authorized to perform this action."
-  #   redirect_back(fallback_location: admin_root_path)
-  # end
+  def pundit_user
+    current_user.presence
+  end
+
+  def user_not_authorized
+    flash[:alert] = "You are not authorized to perform this action."
+    redirect_back fallback_location: root_path
+  end
+
+  def active_admin_controller?
+    is_a?(ActiveAdmin::BaseController)
+  end
+
+  def skip_pundit?
+    devise_controller? ||
+      active_admin_controller? ||
+      self.class.name.start_with?("ActiveAdmin::Devise::") ||
+      current_admin_user.present?
+  end
+
+  def set_current_organization
+    if current_admin_user.present?
+      Current.organization = nil
+    else
+      Current.organization = current_user&.organization
+    end
+  end
+
+  def verify_pundit_authorization
+    return if skip_pundit?
+
+    if action_name == "index"
+      verify_policy_scoped
+    else
+      verify_authorized
+    end
+  end
 end

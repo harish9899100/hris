@@ -1,0 +1,235 @@
+<% content_for :title, @employee.full_name %>
+<% content_for :breadcrumbs do %>
+  <%= link_to "Employees", employees_path, class: "breadcrumb-link" %>
+  <span class="breadcrumb-sep">/</span>
+  <span class="breadcrumb-item"><%= @employee.full_name %></span>
+<% end %>
+
+<div class="page-header">
+  <div class="employee-profile-header">
+    <div class="avatar-lg">
+      <%= @employee.first_name&.first %><%= @employee.last_name&.first %>
+    </div>
+    <div>
+      <h1 class="page-title"><%= @employee.full_name %></h1>
+      <p class="page-subtitle">
+        <%= @employee.position&.title || "No Position" %>
+        <% if @employee.department %>
+          &nbsp;&middot;&nbsp; <%= @employee.department.name %>
+        <% end %>
+      </p>
+    </div>
+    <%= status_badge(@employee.employment_status) %>
+  </div>
+
+  <div class="page-actions">
+    <% if policy(@employee).update? %>
+      <% if @employee.active? %>
+      <%= link_to "Edit", edit_employee_path(@employee), class: "btn btn-outline" %>
+      <%= button_to "Terminate Employee", 
+      employee_path(@employee), 
+      method: :patch,
+      params: { employee: { employment_status: "terminated" } },   # or whatever your status field is
+      class: "px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl text-sm transition-all",
+      data: { confirm: "Terminate #{@employee.full_name || @employee.first_name}? This action can be reversed." } %>
+      <% elsif @employee.terminated? %>
+        <%= button_to "Re-activate", activate_employee_path(@employee),
+              method: :patch,
+              class: "btn btn-success btn-sm",
+              data: { confirm: "Re-activate this employee?" } %>
+      <% end %>
+    <% end %>
+
+    <% if policy(@employee).destroy? %>
+      <%= button_to "Delete", employee_path(@employee),
+            method: :delete,
+            class: "btn btn-ghost btn-sm text-danger",
+            data: { confirm: "Permanently delete #{@employee.full_name}? This cannot be undone." } %>
+    <% end %>
+  </div>
+</div>
+
+<div class="detail-grid">
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Personal Information</h2>
+    </div>
+    <div class="card-body">
+      <dl class="info-list">
+        <div class="info-row">
+          <dt>Full Name</dt>
+          <dd><%= @employee.full_name %></dd>
+        </div>
+        <div class="info-row">
+          <dt>Email</dt>
+          <dd><%= mail_to @employee.email %></dd>
+        </div>
+        <div class="info-row">
+          <dt>Phone</dt>
+          <dd><%= @employee.phone || "—" %></dd>
+        </div>
+        <div class="info-row">
+          <dt>Date of Birth</dt>
+          <dd><%= @employee.date_of_joining&.strftime("%B %-d, %Y") || "—" %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Employment Details</h2>
+    </div>
+    <div class="card-body">
+      <dl class="info-list">
+        <div class="info-row">
+          <dt>Department</dt>
+          <dd>
+            <% if @employee.department %>
+              <%= link_to @employee.department.name, department_path(@employee.department) %>
+            <% else %>
+              —
+            <% end %>
+          </dd>
+        </div>
+        <div class="info-row">
+          <dt>Position</dt>
+          <dd>
+            <% if @employee.position %>
+              <%= link_to @employee.position.title, position_path(@employee.position) %>
+            <% else %>
+              —
+            <% end %>
+          </dd>
+        </div>
+        <div class="info-row">
+          <dt>Employment Status</dt>
+          <dd><%= status_badge(@employee.employment_status) %></dd>
+        </div>
+        <div class="info-row">
+          <dt>Hire Date</dt>
+          <dd><%= @employee.date_of_joining&.strftime("%B %-d, %Y") || "—" %></dd>
+        </div>
+        <div class="info-row">
+          <dt>Base Salary</dt>
+          <dd>
+            <% if @employee.salary.present? %>
+              <%= number_to_currency(@employee.salary) %>
+              <span class="text-muted">/ <%= number_to_currency(@employee.salary) %></span>
+            <% else %>
+              —
+            <% end %>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Recent Attendance</h2>
+      <%= link_to "All Records",
+            attendance_records_path(employee_id: @employee.id),
+            class: "card-link" %>
+    </div>
+    <div class="card-body p-0">
+      <% if @recent_attendance.any? %>
+        <table class="data-table data-table--compact">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Check In</th>
+              <th>Check Out</th>
+              <th>Hours</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_attendance.each do |rec| %>
+              <tr>
+                <td><%= rec.date&.strftime("%b %-d") %></td>
+                <td><%= rec.check_in&.strftime("%H:%M") || "—" %></td>
+                <td><%= rec.check_out&.strftime("%H:%M") || "—" %></td>
+                <td><%= rec.hours_worked&.round(1) || "—" %></td>
+                <td><%= status_badge(rec.status) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="empty-state"><p>No attendance records.</p></div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Leave Requests</h2>
+      <%= link_to "All Leaves",
+            leave_requests_path(employee_id: @employee.id),
+            class: "card-link" %>
+    </div>
+    <div class="card-body p-0">
+      <% if @leave_requests.any? %>
+        <table class="data-table data-table--compact">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @leave_requests.each do |leave| %>
+              <tr>
+                <td><%= leave.leave_type&.humanize %></td>
+                <td><%= leave.start_date&.strftime("%b %-d") %></td>
+                <td><%= leave.end_date&.strftime("%b %-d") %></td>
+                <td><%= status_badge(leave.status) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="empty-state"><p>No leave requests.</p></div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Recent Payslips</h2>
+      <%= link_to "All Payslips",
+            payslips_path(employee_id: @employee.id),
+            class: "card-link" %>
+    </div>
+    <div class="card-body p-0">
+      <% if @recent_payslips.any? %>
+        <table class="data-table data-table--compact">
+          <thead>
+            <tr>
+              <th>Gross</th>
+              <th>Net</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_payslips.each do |payslip| %>
+              <tr>
+                <td><%= number_to_currency(payslip.gross) %></td>
+                <td><%= number_to_currency(payslip.net) %></td>
+                <td><%#= status_badge(payslip.status) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="empty-state"><p>No payslips generated.</p></div>
+        <% end %>
+    </div>
+  </div>
+  <%= button_to "Log Out", destroy_user_session_path, method: :delete %>
+
+</div>

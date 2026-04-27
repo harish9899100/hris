@@ -1,0 +1,17 @@
+<h2>Mark Attendance</h2>
+
+<% record = AttendanceRecord.find_by(employee_id: current_user.employee_id, date: Date.today) %>
+
+<% if record.nil? %>
+  <%= button_to "Check In", attendance_records_path, method: :post, class: "btn btn-success" %>
+
+<% elsif record.check_in.present? && record.check_out.nil? %>
+  <p>Checked in at: <%= record.check_in.strftime("%I:%M %p") %></p>
+
+  <%= button_to "Check Out", attendance_records_path, method: :post, class: "btn btn-danger" %>
+
+<% else %>
+  <p> Attendance completed</p>
+  <p>Check In: <%= record.check_in.strftime("%I:%M %p") %></p>
+  <p>Check Out: <%= record.check_out.strftime("%I:%M %p") %></p>
+<% end %>

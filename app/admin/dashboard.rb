@@ -3,6 +3,38 @@ ActiveAdmin.register_page "Dashboard" do
 
   content title: proc { I18n.t("active_admin.dashboard") } do
 
+    # div do
+    #   form action: "/admin", method: :get do
+    #     input type: "date", name: "date", value: params[:date]
+    #     input type: "submit", value: "Filter"
+    #   end
+    # end
+
+    panel "Organizations" do
+      table_for Organization.limit(5) do
+        column :id
+        column :name
+        column :created_at
+      end
+
+      div do
+        link_to "View All Organizations", admin_organizations_path
+      end
+    end
+
+    panel "Attendance Stats" do
+      date = params[:date].present? ? Date.parse(params[:date]) : Date.today
+
+      para "Showing data for: #{date}"
+
+      table_for AttendanceRecord.where(date: date) do
+        column :employee
+        column :status
+        column :check_in
+        column :check_out
+      end
+    end
+
     columns do
       column do
         panel "Headcount" do
@@ -48,11 +80,10 @@ ActiveAdmin.register_page "Dashboard" do
 
           div style: "display: flex; gap: 30px; padding: 10px 0;" do
             [
-              ["Present",    summary[:present],    "#27ae60"],
-              ["Absent",     summary[:absent],     "#e74c3c"],
-              ["On Leave",   summary[:on_leave],   "#2980b9"],
-              ["Incomplete", summary[:incomplete], "#f39c12"],
-              ["Late",       summary[:late],       "#e67e22"]
+              ["Present",    summary[:present], ],
+              ["Absent",     summary[:absent],  ],
+              ["On Leave",   summary[:on_leave],],
+              ["Incomplete", summary[:incomplete],],
             ].each do |label, count, color|
               div style: "text-align: center;" do
                 h3 count.to_s, style: "color: #{color}; font-size: 32px; margin: 0;"

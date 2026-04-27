@@ -1,31 +1,110 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= content_for(:title) || "HumanResourceInformationSystem" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Hris">
-    <meta name="mobile-web-app-capable" content="yes">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
 
-    <%= yield :head %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+  <title>
+    <%= content_for?(:title) ? "#{yield(:title)} - HRIS" : "HRIS Employee Portal" %>
+  </title>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+  <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
-  </head>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-  <body>
-    <p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
-    <%= yield %>
-  </body>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #f8fafc;
+    }
+
+    .nav-link {
+      @apply block px-4 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-100;
+    }
+
+    .nav-link.active {
+      background: #e0e7ff;
+      color: #4338ca;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen">
+
+  <div class="flex min-h-screen">
+
+    <% if user_signed_in? && current_employee %>
+
+      <aside class="w-64 bg-white border-r p-4">
+
+        <h1 class="text-xl font-bold mb-6">HRIS Portal</h1>
+
+        <div class="mb-6 p-3 bg-slate-50 rounded-xl">
+          <p class="font-semibold"><%= current_employee.full_name %></p>
+          <p class="text-sm text-slate-500">
+            ID: <%= current_employee.employee_id %>
+          </p>
+        </div>
+
+        <nav class="space-y-3">
+          <%= link_to dashboards_path,
+              class: "group flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-700 bg-white shadow-sm border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 hover:shadow-md transition-all duration-200 #{controller_name == 'dashboards' ? 'bg-blue-600 text-black border-blue-600 shadow-md' : ''}" do %>
+            <span>Dashboard</span>
+          <% end %>
+
+          <%= link_to attendance_records_path,
+              class: "group flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-700 bg-white shadow-sm border border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300 hover:shadow-md transition-all duration-200 #{controller_name == 'attendance_records' ? 'bg-green-600 text-black border-green-600 shadow-md' : ''}" do %>
+            <span>Attendance</span>
+          <% end %>
+
+          <%= link_to leave_requests_path,
+              class: "group flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-700 bg-white shadow-sm border border-gray-200 hover:bg-yellow-50 hover:text-yellow-600 hover:border-yellow-300 hover:shadow-md transition-all duration-200 #{controller_name == 'leave_requests' ? 'bg-yellow-500 text-black border-yellow-500 shadow-md' : ''}" do %>
+            <span>Leave Requests</span>
+          <% end %>
+
+          <%= link_to payslips_path,
+              class: "group flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-700 bg-white shadow-sm border border-gray-200 hover:bg-purple-50 hover:text-purple-600 hover:border-purple-300 hover:shadow-md transition-all duration-200 #{controller_name == 'payslips' ? 'bg-purple-600 text-black border-purple-600 shadow-md' : ''}" do %>
+            <span>Payslips</span>
+          <% end %>
+
+          <%= button_to destroy_user_session_path,
+              method: :delete,
+              class: "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-600 hover:text-white hover:shadow-md transition-all duration-200 cursor-pointer text-left" do %>
+            <span>Logout</span>
+          <% end %>
+        </nav>
+
+      </aside>
+
+    <% end %>
+
+    <main class="flex-1 p-8">
+
+      <% if notice.present? %>
+        <div class="mb-4 bg-green-100 text-green-700 px-4 py-2 rounded-xl">
+          <%= notice %>
+        </div>
+      <% end %>
+
+      <% if alert.present? %>
+        <div class="mb-4 bg-red-100 text-red-700 px-4 py-2 rounded-xl">
+          <%= alert %>
+        </div>
+      <% end %>
+
+      <%= yield %>
+
+    </main>
+
+  </div>
+
+</body>
 </html>

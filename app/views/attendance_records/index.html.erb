@@ -1,0 +1,195 @@
+<% content_for :title, "Attendance" %>
+
+<div class="mb-6 flex items-center justify-between flex-wrap gap-3">
+  <div>
+    <h1 class="text-xl font-bold text-slate-800">Attendance History</h1>
+    <p class="text-slate-400 text-sm mt-0.5">Your monthly check-in & check-out records</p>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <%
+      first_of_month = Date.new(@year, @month, 1)
+      prev_m = first_of_month.prev_month
+      next_m = first_of_month.next_month
+    %>
+    <%= link_to attendance_records_path(year: prev_m.year, month: prev_m.month),
+          class: "w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-500 transition-colors" do %>
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+    <% end %>
+    <span class="px-5 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 min-w-36 text-center shadow-sm">
+      <%= first_of_month.strftime("%B %Y") %>
+    </span>
+    <% if next_m <= Date.current.beginning_of_month %>
+      <%= link_to attendance_records_path(year: next_m.year, month: next_m.month),
+            class: "w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-500 transition-colors" do %>
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      <% end %>
+    <% else %>
+      <span class="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-100 text-slate-200 cursor-not-allowed">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </span>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <% [
+    ["Present",  @present_count,  "emerald", "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"],
+    ["Absent",   @absent_count,   "red",     "M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"],
+    ["Late",     @late_count,     "amber",   "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"],
+    ["Half Day", @half_day_count, "blue",    "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"],
+  ].each do |label, val, color, icon| %>
+    <div class="bg-white rounded-2xl border border-slate-100 px-5 py-4 shadow-sm flex items-center gap-4">
+      <div class="w-10 h-10 rounded-xl bg-<%= color %>-50 flex items-center justify-center flex-shrink-0">
+        <svg class="w-5 h-5 text-<%= color %>-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="<%= icon %>"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-2xl font-extrabold text-slate-800"><%= val %></p>
+        <p class="text-xs text-slate-400 font-medium"><%= label %></p>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+  <div class="px-6 py-4 border-b border-slate-50 flex items-center justify-between">
+    <h2 class="font-bold text-slate-700 text-sm">Monthly Calendar</h2>
+    <div class="flex items-center gap-3 flex-wrap">
+      <% [["Present","emerald"],["Absent","red"],["Late","amber"],["Half Day","blue"],["Today","indigo"]].each do |lbl,c| %>
+        <div class="flex items-center gap-1.5">
+          <span class="w-3 h-3 rounded-sm bg-<%= c %>-200 inline-block"></span>
+          <span class="text-[11px] text-slate-400 font-medium"><%= lbl %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="p-5">
+    <div class="grid grid-cols-7 mb-1">
+      <% %w[Sun Mon Tue Wed Thu Fri Sat].each do |d| %>
+        <div class="text-center text-[11px] font-bold text-slate-400 uppercase tracking-wider py-2"><%= d %></div>
+      <% end %>
+    </div>
+
+    <%
+      first_day   = Date.new(@year, @month, 1)
+      last_day    = first_day.end_of_month
+      start_offset = first_day.wday
+      total_cells  = (start_offset + last_day.day)
+      rows         = (total_cells / 7.0).ceil
+    %>
+
+    <div class="grid grid-cols-7 gap-1.5">
+      <% (rows * 7).times do |i| %>
+        <%
+          day_num   = i - start_offset + 1
+          date      = (day_num.between?(1, last_day.day)) ? Date.new(@year, @month, day_num) : nil
+          record    = @records_by_date[date] if date
+          is_today  = date == Date.current
+          is_wknd   = date&.saturday? || date&.sunday?
+          is_future = date && date > Date.current
+
+          cell_class = if !date
+            "opacity-0 pointer-events-none"
+          elsif is_today && record
+            case record.status
+            when "present"  then "bg-emerald-100 ring-2 ring-emerald-400 ring-offset-1"
+            when "absent"   then "bg-red-100 ring-2 ring-red-400 ring-offset-1"
+            when "late"     then "bg-amber-100 ring-2 ring-amber-400 ring-offset-1"
+            when "half_day" then "bg-blue-100 ring-2 ring-blue-400 ring-offset-1"
+            else "bg-indigo-100 ring-2 ring-indigo-400 ring-offset-1"
+            end
+          elsif is_today
+            "bg-indigo-50 ring-2 ring-indigo-400 ring-offset-1"
+          elsif record
+            case record.status
+            when "present"  then "bg-emerald-50 hover:bg-emerald-100"
+            when "absent"   then "bg-red-50 hover:bg-red-100"
+            when "late"     then "bg-amber-50 hover:bg-amber-100"
+            when "half_day" then "bg-blue-50 hover:bg-blue-100"
+            else "bg-slate-50"
+            end
+          elsif is_future || is_wknd
+            "bg-transparent"
+          else
+            "bg-red-50/40" 
+          end
+
+          text_class = if !date || is_future
+            "text-slate-300"
+          elsif record
+            case record.status
+            when "present"  then "text-emerald-700"
+            when "absent"   then "text-red-600"
+            when "late"     then "text-amber-700"
+            when "half_day" then "text-blue-600"
+            else "text-slate-500"
+            end
+          elsif is_today
+            "text-indigo-700"
+          else
+            "text-slate-400"
+          end
+        %>
+        <div class="rounded-xl <%= cell_class %> transition-colors aspect-square flex flex-col items-center justify-center cursor-default select-none group relative">
+          <span class="text-sm font-bold <%= text_class %>"><%= date&.day %></span>
+          <% if record %>
+            <span class="text-[8px] leading-none mt-0.5 <%= text_class %> opacity-80 capitalize">
+              <%= record.status&.gsub("_", " ") %>
+            </span>
+          <% end %>
+          <% if is_today %>
+            <span class="absolute bottom-1 w-1 h-1 rounded-full bg-indigo-400"></span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+  <div class="px-6 py-4 border-b border-slate-50">
+    <h2 class="font-bold text-slate-700 text-sm">Detailed Log</h2>
+  </div>
+  <% if @records.empty? %>
+    <div class="px-6 py-14 text-center text-slate-300 text-sm">No attendance records for this month.</div>
+  <% else %>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-slate-50">
+            <th class="px-6 py-3 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Date</th>
+            <th class="px-6 py-3 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Check In</th>
+            <th class="px-6 py-3 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Check Out</th>
+            <th class="px-6 py-3 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Duration</th>
+            <th class="px-6 py-3 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-50">
+          <% @records.reverse.each do |rec| %>
+            <tr class="hover:bg-slate-50/60 transition-colors">
+              <td class="px-6 py-3.5">
+                <p class="font-semibold text-slate-700"><%= rec.date.strftime("%a, %b %-d") %></p>
+                <% if rec.date == Date.current %>
+                  <span class="text-[10px] text-brand-500 font-bold">TODAY</span>
+                <% end %>
+              </td>
+              <td class="px-6 py-3.5 mono text-slate-600 font-medium"><%= rec.check_in&.strftime("%I:%M %p") || "—" %></td>
+              <td class="px-6 py-3.5 mono text-slate-600 font-medium"><%= rec.check_out&.strftime("%I:%M %p") || "—" %></td>
+              <td class="px-6 py-3.5 text-slate-500 font-medium"><%= rec.duration_formatted %></td>
+              <td class="px-6 py-3.5"><%= render "shared/attendance_badge", status: rec.status %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

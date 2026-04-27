@@ -122,8 +122,22 @@ ActiveAdmin.register AttendanceRecord do
   end
 
   controller do
+    def create
+      build_resource
+
+      resource.organization = Organization.first 
+
+      if resource.save
+        redirect_to resource_path(resource), notice: "Attendance created"
+      else
+        flash[:error] = resource.errors.full_messages.join(", ")
+        puts resource.errors.full_messages 
+        render :new
+      end
+    end
+
     def scoped_collection
-      super.includes(employee: :department)
+      AttendanceRecord.unscoped
     end
   end
 end

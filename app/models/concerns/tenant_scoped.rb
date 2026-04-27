@@ -8,7 +8,7 @@ module TenantScoped
       if Current.organization.present?
         where(organization: Current.organization)
       else
-        none
+        all
       end
     end
   end

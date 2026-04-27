@@ -1,0 +1,147 @@
+<% content_for :title, "Dashboard" %>
+
+<div class="mb-8">
+  <h1 class="text-2xl font-semibold text-slate-800">Good <%= greeting_time %>, <%= @employee.first_name %> 👋</h1>
+  <p class="text-slate-500 text-sm mt-1"><%= Date.current.strftime("%A, %B %-d, %Y") %></p>
+</div>
+
+<div class="bg-white rounded-2xl border border-slate-200 p-6 mb-6 shadow-sm">
+  <div class="flex items-center justify-between flex-wrap gap-4">
+    <div>
+      <h2 class="font-semibold text-slate-700 mb-1">Today's Attendance</h2>
+      <% if @attendance %>
+        <div class="flex items-center gap-4 text-sm text-slate-600">
+          <span class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+            Check-in: <span class="font-medium mono text-slate-800"><%= @attendance.check_in.strftime("%I:%M %p") %></span>
+          </span>
+          <% if @attendance.checked_out? %>
+            <span class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-slate-400 inline-block"></span>
+              Check-out: <span class="font-medium mono text-slate-800"><%= @attendance.check_out.strftime("%I:%M %p") %></span>
+            </span>
+            <span class="text-slate-500">Duration: <strong class="text-slate-800"><%= @attendance.duration_formatted %></strong></span>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-slate-500">You haven't checked in yet today.</p>
+      <% end %>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <% if @attendance.nil? %>
+        <%= button_to check_in_employee_attendance_records_path,
+              method: :post,
+              class: "inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors shadow-sm" do %>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+          </svg>
+          Check In
+        <% end %>
+      <% elsif @attendance.checked_in? && !@attendance.checked_out? %>
+        <div class="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg text-sm font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block"></span>
+          Currently Checked In
+        </div>
+        <%= button_to check_out_employee_attendance_records_path,
+              method: :post,
+              class: "inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-800 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors shadow-sm" do %>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Check Out
+        <% end %>
+      <% else %>
+        <div class="flex items-center gap-2 text-slate-500 bg-slate-100 px-3 py-2 rounded-lg text-sm font-medium">
+          ✓ Day Complete · <%= @attendance.duration_formatted %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+    <p class="text-xs text-slate-500 uppercase tracking-wide font-medium mb-2">Present (This Month)</p>
+    <p class="text-3xl font-bold text-emerald-600"><%= @present_days %></p>
+    <p class="text-xs text-slate-400 mt-1">days</p>
+  </div>
+  <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+    <p class="text-xs text-slate-500 uppercase tracking-wide font-medium mb-2">Absent</p>
+    <p class="text-3xl font-bold text-red-500"><%= @absent_days %></p>
+    <p class="text-xs text-slate-400 mt-1">days</p>
+  </div>
+  <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+    <p class="text-xs text-slate-500 uppercase tracking-wide font-medium mb-2">Late Arrivals</p>
+    <p class="text-3xl font-bold text-amber-500"><%= @late_days %></p>
+    <p class="text-xs text-slate-400 mt-1">days</p>
+  </div>
+  <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+    <p class="text-xs text-slate-500 uppercase tracking-wide font-medium mb-2">Annual Leave Left</p>
+    <p class="text-3xl font-bold text-indigo-600"><%= @leave_balance[:annual] %></p>
+    <p class="text-xs text-slate-400 mt-1">days remaining</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <h2 class="font-semibold text-slate-700 text-sm">Recent Attendance</h2>
+      <%= link_to "View All →", employee_attendance_records_path, class: "text-indigo-600 text-xs hover:underline" %>
+    </div>
+    <div class="divide-y divide-slate-50">
+      <% if @recent_attendance.empty? %>
+        <div class="px-6 py-8 text-center text-slate-400 text-sm">No attendance records yet.</div>
+      <% else %>
+        <% @recent_attendance.each do |record| %>
+          <div class="px-6 py-3.5 flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-slate-700"><%= record.date.strftime("%a, %b %-d") %></p>
+              <p class="text-xs text-slate-400 mono">
+                <%= record.check_in&.strftime("%I:%M %p") || "—" %>
+                <% if record.check_out %>
+                  → <%= record.check_out.strftime("%I:%M %p") %>
+                <% end %>
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <%= render "shared/status_badge", status: record.status %>
+              <% if record.duration %>
+                <span class="text-xs text-slate-400 mono"><%= record.duration_formatted %></span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# ── Leave Requests ─────────────────────────────────────────────────────── %>
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <h2 class="font-semibold text-slate-700 text-sm">Recent Leave Requests</h2>
+      <%= link_to "Apply Leave →", new_employee_leave_request_path, class: "text-indigo-600 text-xs hover:underline" %>
+    </div>
+    <div class="divide-y divide-slate-50">
+      <% if @recent_leaves.empty? %>
+        <div class="px-6 py-8 text-center text-slate-400 text-sm">No leave requests yet.</div>
+      <% else %>
+        <% @recent_leaves.each do |leave| %>
+          <div class="px-6 py-3.5 flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-slate-700 capitalize"><%= leave.leave_type %> Leave</p>
+              <p class="text-xs text-slate-400">
+                <%= leave.start_date.strftime("%b %-d") %> – <%= leave.end_date.strftime("%b %-d, %Y") %>
+                · <%= leave.duration_days %> day<%= "s" if leave.duration_days > 1 %>
+              </p>
+            </div>
+            <%= render "shared/leave_status_badge", status: leave.status %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="px-6 py-3 bg-slate-50 border-t border-slate-100">
+      <%= link_to "View All Leave Requests", employee_leave_requests_path, class: "text-xs text-slate-500 hover:text-indigo-600 transition-colors" %>
+    </div>
+  </div>
+</div>

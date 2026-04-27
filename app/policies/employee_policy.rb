@@ -1,50 +1,63 @@
 class EmployeePolicy < ApplicationPolicy
   def index?
-    manager_or_above?
+    return true if admin_user?
+
+    hr_manager? || dept_manager?
   end
+
   def show?
-    manager_or_above? || own_record?
+    return true if admin_user?
+
+    own_record? || hr_manager? || dept_manager?
   end
+
   def create?
-    hr_or_above?
+    return true if admin_user?
+
+    hr_manager?
   end
-  def new?
-    create?
-  end
+
   def update?
-    hr_or_above?
-  end
-  def edit?
-    update?
-  end
-  def destroy?
-    super_admin?
+    return true if admin_user?
+
+    hr_manager? || (dept_manager? && manages_record?)
   end
 
-class Scope < ApplicationPolicy::Scope
-  def resolve
-    if hr_or_above?
-      scope.all
+  class Scope < ApplicationPolicy::Scope
+    def resolve
+      return scope.all if user.is_a?(AdminUser)
 
-    elsif dept_manager?
-      department_id = user.employee&.department_id
-      return scope.none unless department_id
-
-      scope.where(department_id: department_id)
-
-    elsif employee_role?
-      employee = user.employee
-      return scope.none unless employee
-
-      scope.where(id: employee.id)
-
-    else
-      scope.none
+      if user.hr_manager?
+        scope.all
+      elsif user.dept_manager?
+        scope.where(manager_id: user.employee_id)
+      elsif user.employee_role?
+        scope.where(id: user.employee_id)
+      else
+        scope.none
+      end
     end
   end
-end
+
   private
+
+  def admin_user?
+    user.is_a?(AdminUser)
+  end
+
+  def hr_manager?
+    user.respond_to?(:hr_manager?) && user.hr_manager?
+  end
+
+  def dept_manager?
+    user.respond_to?(:dept_manager?) && user.dept_manager?
+  end
+
   def own_record?
     record.id == user.employee_id
+  end
+
+  def manages_record?
+    record.manager_id == user.employee_id
   end
 end

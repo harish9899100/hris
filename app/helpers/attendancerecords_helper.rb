@@ -1,0 +1,2 @@
+module AttendancerecordsHelper
+end

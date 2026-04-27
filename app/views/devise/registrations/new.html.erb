@@ -1,29 +1,93 @@
-<h2>Sign up</h2>
+<% content_for :title, "Sign Up" %>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-4 relative overflow-hidden">
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+  <div class="absolute inset-0 opacity-30 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdHRlcm4gaWQ9ImciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPBlVzZSI+PHBhdGggZD0iTTYwIDAgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC4zIi8+PC9wYXR0ZXJuPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZykiLz48L3N2Zz4=')]"></div>
+
+  <div class="w-full max-w-md relative z-10">
+
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 rounded-2xl bg-brand-500 flex items-center justify-center mx-auto shadow-xl shadow-brand-500/40">
+        <span class="text-white text-3xl font-bold">H</span>
+      </div>
+
+      <h1 class="text-white text-3xl font-bold mt-4">Hunam Resource Information System Portal</h1>
+      <p class="text-slate-400 mt-2">Create your employee account</p>
+    </div>
+
+    <div class="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-semibold text-white">Create Account</h2>
+        <p class="text-slate-400 mt-2 text-sm">
+          Join HRIS and manage work smarter
+        </p>
+      </div>
+
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+
+        <%= render "devise/shared/error_messages", resource: resource %>
+
+        <div class="space-y-5">
+
+          <div>
+            <label class="text-sm text-slate-300 block mb-2">Email</label>
+
+            <%= f.email_field :email,
+                autofocus: true,
+                autocomplete: "email",
+                placeholder: "you@company.com",
+                class: "w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500" %>
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-300 block mb-2">
+              Password
+            </label>
+
+            <% if @minimum_password_length %>
+              <p class="text-xs text-slate-500 mb-2">
+                Minimum <%= @minimum_password_length %> characters
+              </p>
+            <% end %>
+
+            <%= f.password_field :password,
+                autocomplete: "new-password",
+                placeholder: "Create password",
+                class: "w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500" %>
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-300 block mb-2">
+              Confirm Password
+            </label>
+
+            <%= f.password_field :password_confirmation,
+                autocomplete: "new-password",
+                placeholder: "Confirm password",
+                class: "w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500" %>
+          </div>
+
+          <%= f.submit "Create Account",
+              class: "w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-2xl transition mt-2" %>
+
+        </div>
+
+      <% end %>
+
+      <div class="text-center mt-6 text-sm">
+        <span class="text-slate-400">Already have an account?</span>
+
+        <%= link_to "Sign In",
+            new_user_session_path,
+            class: "text-brand-400 hover:text-brand-300 ml-1 font-medium" %>
+      </div>
+
+    </div>
+
+    <div class="text-center text-xs text-slate-500 mt-6">
+      Human Resource Information System © <%= Time.current.year %>
+    </div>
+
   </div>
-
-  <div class="field">
-    <p><%= f.label :password %></p>
-    <% if @minimum_password_length %>
-      <p><em>(<%= @minimum_password_length %> characters minimum)</em></p>
-    <% end %>
-    <p><%= f.password_field :password, autocomplete: "new-password" %></p>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :password_confirmation %></p>
-    <p><%= f.password_field :password_confirmation, autocomplete: "new-password" %></p>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Sign up" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

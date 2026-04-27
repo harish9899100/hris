@@ -1,0 +1,157 @@
+<% content_for :title, "Apply Leave" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6 flex items-center gap-3">
+    <%= link_to leave_requests_path,
+          class: "w-8 h-8 flex items-center justify-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-500 transition-colors" do %>
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+    <% end %>
+    <div>
+      <h1 class="text-xl font-bold text-slate-800">Apply for Leave</h1>
+      <p class="text-slate-400 text-sm">Submit a request for manager approval</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-3 mb-6">
+    <% [["Annual", @leave_balance[:annual], "brand"], ["Sick", @leave_balance[:sick], "emerald"], ["Casual", @leave_balance[:casual], "amber"]].each do |name, val, color| %>
+      <div class="bg-<%= color == 'brand' ? 'indigo' : color %>-50 border border-<%= color == 'brand' ? 'indigo' : color %>-100 rounded-2xl px-4 py-3 text-center">
+        <p class="text-2xl font-extrabold text-<%= color == 'brand' ? 'indigo' : color %>-600"><%= val %></p>
+        <p class="text-xs text-<%= color == 'brand' ? 'indigo' : color %>-400 font-medium"><%= name %> remaining</p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-7">
+    <%= form_with model: @leave_request,
+          url: leave_requests_path,
+          method: :post,
+          class: "space-y-5" do |f| %>
+
+      <% if @leave_request.errors.any? %>
+        <div class="bg-red-50 border border-red-200 rounded-2xl p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="text-sm font-bold text-red-700">Please fix these errors:</p>
+          </div>
+          <ul class="space-y-1 ml-6 list-disc">
+            <% @leave_request.errors.full_messages.each do |msg| %>
+              <li class="text-sm text-red-600"><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div>
+        <label class="block text-sm font-bold text-slate-700 mb-2">Leave Type</label>
+        <div class="grid grid-cols-2 gap-2" id="leave-type-selector">
+          <% LeaveRequest::LEAVE_TYPES.each do |type| %>
+            <label class="leave-type-option relative cursor-pointer">
+              <%= f.radio_button :leave_type, type, class: "sr-only peer", id: "leave_type_#{type}" %>
+              <div class="peer-checked:border-brand-500 peer-checked:bg-brand-50 peer-checked:text-brand-700
+                          border-2 border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-500
+                          hover:border-slate-300 hover:bg-slate-50 transition-all flex items-center gap-2.5">
+                <%=
+                  icon = case type
+                  when "annual"  
+                  when "sick"    
+                  when "casual"  
+                  when "unpaid" 
+                  end
+                %>
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="<%= icon %>"/>
+                </svg>
+                <%= type.capitalize %>
+              </div>
+            </label>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2">Start Date</label>
+          <%= f.date_field :start_date,
+                id: "start_date",
+                min: Date.current.to_s,
+                value: @leave_request.start_date,
+                class: "w-full border-2 border-slate-200 rounded-2xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-brand-400 transition-colors" %>
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2">End Date</label>
+          <%= f.date_field :end_date,
+                id: "end_date",
+                min: Date.current.to_s,
+                value: @leave_request.end_date,
+                class: "w-full border-2 border-slate-200 rounded-2xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-brand-400 transition-colors" %>
+        </div>
+      </div>
+
+      <div id="duration-preview" class="hidden items-center gap-3 bg-brand-50 border border-brand-100 rounded-2xl px-4 py-3">
+        <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="text-sm font-semibold text-brand-700" id="duration-text"></p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-bold text-slate-700 mb-2">
+          Reason
+          <span class="text-slate-400 font-normal">(minimum 10 characters)</span>
+        </label>
+        <%= f.text_area :reason,
+              id: "leave_reason",
+              rows: 4,
+              placeholder: "Please describe the reason for your leave...",
+              class: "w-full border-2 border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-brand-400 transition-colors resize-none placeholder:text-slate-300" %>
+        <div class="flex justify-end mt-1">
+          <span id="char-count" class="text-xs text-slate-300 font-medium mono">0 chars</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <%= f.submit "Submit Leave Request",
+              class: "bg-brand-500 hover:bg-brand-600 active:scale-95 text-black text-sm font-bold px-7 py-3 rounded-2xl transition-all cursor-pointer shadow-md shadow-brand-500/25" %>
+        <%= link_to "Discard", leave_requests_path,
+              class: "text-sm font-semibold text-slate-400 hover:text-slate-600 px-4 py-3 rounded-2xl hover:bg-slate-100 transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  const startEl  = document.getElementById('start_date');
+  const endEl    = document.getElementById('end_date');
+  const preview  = document.getElementById('duration-preview');
+  const durText  = document.getElementById('duration-text');
+
+  function calcDuration() {
+    const s = new Date(startEl.value);
+    const e = new Date(endEl.value);
+    if (startEl.value && endEl.value && e >= s) {
+      const days = Math.round((e - s) / 86400000) + 1;
+      durText.textContent = ` This leave spans ${days} day${days > 1 ? 's' : ''} (${startEl.value} → ${endEl.value})`;
+      preview.classList.remove('hidden');
+      preview.classList.add('flex');
+      endEl.min = startEl.value;
+    } else {
+      preview.classList.add('hidden');
+      preview.classList.remove('flex');
+    }
+  }
+
+  startEl?.addEventListener('change', calcDuration);
+  endEl?.addEventListener('change', calcDuration);
+
+  const reasonEl  = document.getElementById('leave_reason');
+  const countEl   = document.getElementById('char-count');
+  reasonEl?.addEventListener('input', () => {
+    const len = reasonEl.value.length;
+    countEl.textContent = `${len} chars`;
+    countEl.className = `text-xs font-medium mono ${len >= 10 ? 'text-emerald-500' : 'text-red-400'}`;
+  });
+</script>
