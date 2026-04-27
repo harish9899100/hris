@@ -3,12 +3,12 @@ ActiveAdmin.register_page "Dashboard" do
 
   content title: proc { I18n.t("active_admin.dashboard") } do
 
-    div do
-      form action: "/admin", method: :get do
-        input type: "date", name: "date", value: params[:date]
-        input type: "submit", value: "Filter"
-      end
-    end
+    # div do
+    #   form action: "/admin", method: :get do
+    #     input type: "date", name: "date", value: params[:date]
+    #     input type: "submit", value: "Filter"
+    #   end
+    # end
 
     panel "Organizations" do
       table_for Organization.limit(5) do

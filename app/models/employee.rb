@@ -37,14 +37,18 @@ class Employee < ApplicationRecord
   end
 
   def leave_balance
+    settings = organization.settings || {}
+    annual_total = settings["annual_leave_quota"] || 21
+    sick_total   = settings["sick_leave_quota"] || 10
+    casual_total = settings["casual_leave_quota"] || 7
     annual_used = leave_requests.approved.where(leave_type: "annual").where("start_date >= ?", Date.current.beginning_of_year).to_a.sum(&:duration_days)
     sick_used = leave_requests.approved.where(leave_type: "sick").where("start_date >= ?", Date.current.beginning_of_year).to_a.sum(&:duration_days)
     casual_used = leave_requests.approved.where(leave_type: "casual").where("start_date >= ?", Date.current.beginning_of_year).to_a.sum(&:duration_days)
 
     {
-      annual: [21 - annual_used, 0].max,
-      sick:   [10 - sick_used, 0].max,
-      casual: [7 - casual_used, 0].max
+      annual: [annual_total - annual_used, 0].max,
+      sick:   [sick_total - sick_used, 0].max,
+      casual: [casual_total - casual_used, 0].max
     }
   end
 
